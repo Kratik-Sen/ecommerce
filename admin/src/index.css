@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+:root {
+  background: #f8f4e8;
+  color: #1f2a24;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #f8f4e8 0%, #e9efe4 52%, #c7d1c8 100%);
+  color: #1f2a24;
+}
+
+button,
+input,
+textarea,
+select {
+  color: inherit;
+}
