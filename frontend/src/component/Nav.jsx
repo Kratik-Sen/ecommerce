@@ -33,8 +33,7 @@ function Nav() {
   return (
     <div className='w-[100vw] h-[70px] bg-[#f8f4e8ec] z-10 fixed top-0 flex items-center justify-between px-[30px] shadow-md shadow-[#8f968f]'>
       <div className='w-[18%] lg:w-[24%] flex items-center justify-start gap-[10px]'>
-        <img src={logo} alt="" className='w-[30px]' />
-        <h1 className='text-[25px] text-[#1f2a24] font-sans'>OneCart</h1>
+        <img src={logo} alt="" className='w-[52px] cursor-pointer' onClick={() => navigate("/")} />
       </div>
 
       <div className='w-[64%] lg:w-[56%] hidden md:flex'>
@@ -63,11 +62,10 @@ function Nav() {
       )}
 
       {showProfile && (
-        <div className='absolute w-[220px] h-[110px] bg-[#fffaf0f2] top-[110%] right-[4%] border-[1px] border-[#b8c0ba] rounded-[10px] z-10'>
+        <div className='absolute w-[220px] h-[62px] bg-[#fffaf0f2] top-[110%] right-[4%] border-[1px] border-[#b8c0ba] rounded-[10px] z-10'>
           <ul className='w-[100%] h-[100%] flex items-start justify-around flex-col text-[17px] py-[10px] text-[#1f2a24]'>
             {!userData && <li className='w-[100%] hover:bg-[#d8ded8] px-[15px] py-[10px] cursor-pointer' onClick={() => { navigate("/login"); setShowProfile(false) }}>Login</li>}
             {userData && <li className='w-[100%] hover:bg-[#d8ded8] px-[15px] py-[10px] cursor-pointer' onClick={() => { handleLogout(); setShowProfile(false) }}>LogOut</li>}
-            <li className='w-[100%] hover:bg-[#d8ded8] px-[15px] py-[10px] cursor-pointer' onClick={() => { navigate("/about"); setShowProfile(false) }}>About</li>
           </ul>
         </div>
       )}

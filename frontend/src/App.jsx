@@ -18,6 +18,7 @@ import Cart from './pages/Cart'
 import PlaceOrder from './pages/PlaceOrder'
 import ProductDetail from './pages/ProductDetails'
 import Ai from './component/Ai'
+import RateProduct from './pages/RateProduct'
 
 function App() {
 let {userData} = useContext(userDataContext)
@@ -63,6 +64,9 @@ let location = useLocation()
 
 <Route path='/order' 
         element={userData ? <Order/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
+
+<Route path='/rate/:productId' 
+        element={userData ? <RateProduct/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
 
         <Route path='*' element={<NotFound/>}/>
 

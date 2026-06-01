@@ -48,6 +48,13 @@ const productSchema = new mongoose.Schema({
     bestseller:{
         type:Boolean
     },
+    available:{
+        type:Boolean,
+        default:true
+    },
+    deletedAt:{
+        type:Date
+    },
     ratings:[{
         userId:{
             type:String,

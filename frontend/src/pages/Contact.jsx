@@ -31,13 +31,13 @@ function Contact() {
             Learn more about our teams and job openings
           </p>
 
-          <button className='px-[30px] py-[20px] flex items-center justify-center text-[#1f2a24] bg-transparent border active:bg-[#c9d0ca] rounded-md'>
+          {/* <button className='px-[30px] py-[20px] flex items-center justify-center text-[#1f2a24] bg-transparent border active:bg-[#c9d0ca] rounded-md'>
             Explore Jobs
-          </button>
+          </button> */}
         </div>
       </div>
 
-      <NewLetterBox />
+      {/* <NewLetterBox /> */}
     </div>
   )
 }

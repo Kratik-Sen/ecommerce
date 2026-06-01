@@ -12,7 +12,8 @@ import { defaultCategories, defaultSubCategories, isClothingCategory } from '../
 const getSavedOptions = (key, defaults) => {
   try {
     const savedOptions = JSON.parse(localStorage.getItem(key)) || []
-    return [...new Set([...defaults, ...savedOptions])]
+    const removedOptions = JSON.parse(localStorage.getItem(`${key}Removed`)) || []
+    return [...new Set([...defaults, ...savedOptions])].filter(item => !removedOptions.includes(item))
   } catch {
     return defaults
   }
@@ -68,6 +69,27 @@ function Add() {
     setSelected(trimmedValue)
     resetInput("")
     toast.success(`${label} added`)
+  }
+
+  const removeOption = (value, options, setOptions, selected, setSelected, storageKey, label) => {
+    if (options.length <= 1) {
+      toast.error(`Keep at least one ${label}`)
+      return
+    }
+
+    const nextOptions = options.filter(item => item !== value)
+    const savedOptions = nextOptions.filter(item => !(label === "category" ? defaultCategories : defaultSubCategories).includes(item))
+    const removedOptions = (label === "category" ? defaultCategories : defaultSubCategories).filter(item => !nextOptions.includes(item))
+
+    localStorage.setItem(storageKey, JSON.stringify(savedOptions))
+    localStorage.setItem(`${storageKey}Removed`, JSON.stringify(removedOptions))
+    setOptions(nextOptions)
+
+    if (selected === value) {
+      setSelected(nextOptions[0])
+    }
+
+    toast.success(`${label} removed`)
   }
 
   const handleAddProduct = async (e) => {
@@ -208,6 +230,7 @@ function Add() {
             <input type="text" placeholder='Custom category' className='bg-[#c9d0ca] w-[100%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px]' value={customCategory} onChange={(e)=>setCustomCategory(e.target.value)} />
             <button type='button' className='px-[14px] py-[7px] rounded-lg bg-[#b7e4c7] border-[1px] border-[#74c69d]' onClick={()=>addCustomOption(customCategory, categoryOptions, setCategoryOptions, setCategory, setCustomCategory, "category")}>Add</button>
           </div>
+          <button type='button' className='w-[90%] px-[14px] py-[7px] rounded-lg bg-[#fffaf0] border-[1px] border-[#b8c0ba] text-left' onClick={()=>removeOption(category, categoryOptions, setCategoryOptions, category, setCategory, "adminCategories", "category")}>Remove Selected Category</button>
         </div>
         <div className='md:w-[30%] w-[100%] flex items-start sm:justify-center flex-col  gap-[10px]'>
           <p className='text-[20px] md:text-[25px]  font-semibold w-[100%]'>Sub-Category</p>
@@ -221,6 +244,7 @@ function Add() {
             <input type="text" placeholder='Custom sub-category' className='bg-[#c9d0ca] w-[100%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px]' value={customSubCategory} onChange={(e)=>setCustomSubCategory(e.target.value)} />
             <button type='button' className='px-[14px] py-[7px] rounded-lg bg-[#b7e4c7] border-[1px] border-[#74c69d]' onClick={()=>addCustomOption(customSubCategory, subCategoryOptions, setSubCategoryOptions, setSubCategory, setCustomSubCategory, "sub-category")}>Add</button>
           </div>
+          <button type='button' className='w-[90%] px-[14px] py-[7px] rounded-lg bg-[#fffaf0] border-[1px] border-[#b8c0ba] text-left' onClick={()=>removeOption(subCategory, subCategoryOptions, setSubCategoryOptions, subCategory, setSubCategory, "adminSubCategories", "sub-category")}>Remove Selected Sub-Category</button>
         </div>
        </div>
        <div className='w-[80%] h-[100px] flex items-start justify-center flex-col  gap-[10px]'>

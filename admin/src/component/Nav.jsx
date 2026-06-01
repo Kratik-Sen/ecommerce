@@ -28,8 +28,7 @@ function Nav() {
   return (
     <div className='w-[100vw] h-[70px] bg-[#f8f4e8f8] z-10 fixed top-0 flex  items-center justify-between px-[30px] overflow-x-hidden shadow-md shadow-[#8f968f] '>
         <div className='w-[30%]  flex items-center justify-start   gap-[10px] cursor-pointer ' onClick={()=>navigate("/")}>
-        <img src={logo} alt=""  className='w-[30px]'/>
-        <h1 className='text-[25px] text-[#1f2a24] font-sans '>OneCart</h1>
+        <img src={logo} alt=""  className='w-[52px]'/>
 
        
 

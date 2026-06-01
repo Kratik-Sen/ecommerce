@@ -35,7 +35,7 @@ function Home() {
     </div>
     <Product/>
     <OurPolicy/>
-    <NewLetterBox/>
+    {/* <NewLetterBox/> */}
     <Footer/>
 
     </div>

@@ -47,7 +47,7 @@ function About() {
           </div>
         </div>
       </div>
-      <NewLetterBox/>
+      {/* <NewLetterBox/> */}
       
     </div>
   )
