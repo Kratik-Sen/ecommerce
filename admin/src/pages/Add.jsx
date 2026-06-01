@@ -27,7 +27,7 @@ function Add() {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [categoryOptions, setCategoryOptions] = useState(() => getSavedOptions("adminCategories", defaultCategories))
-  const [category, setCategory] = useState(defaultCategories[0])
+  const [category, setCategory] = useState(() => categoryOptions[0] || "")
   const [price, setPrice] = useState("")
   const [customCategory, setCustomCategory] = useState("")
   const [bestseller, setBestSeller] = useState(false)
@@ -42,6 +42,12 @@ function Add() {
   useEffect(() => {
     localStorage.setItem("adminCategories", JSON.stringify(categoryOptions.filter(item => !defaultCategories.includes(item))))
   }, [categoryOptions])
+
+  useEffect(() => {
+    if (!categoryOptions.includes(category)) {
+      setCategory(categoryOptions[0] || "")
+    }
+  }, [categoryOptions, category])
 
   useEffect(() => {
     if (!hasSizeOptions) {
@@ -146,7 +152,7 @@ function Add() {
       setBestSeller(false)
       setSizes([])
       setCustomWeight("")
-      setCategory(defaultCategories[0])
+      setCategory(categoryOptions[0] || "")
       }
 
       

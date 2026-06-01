@@ -24,6 +24,7 @@ function App() {
 let {userData} = useContext(userDataContext)
 let location = useLocation()
 let isAuthPage = location.pathname === "/login" || location.pathname === "/signup"
+let hideAi = isAuthPage || location.pathname === "/placeorder"
   return (
    <>
     <ToastContainer/>
@@ -72,7 +73,7 @@ let isAuthPage = location.pathname === "/login" || location.pathname === "/signu
         <Route path='*' element={<NotFound/>}/>
 
    </Routes>
-    {!isAuthPage && <Ai />}
+    {!hideAi && <Ai />}
    </>
   )
 }

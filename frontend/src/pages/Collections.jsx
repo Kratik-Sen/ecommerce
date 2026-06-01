@@ -4,7 +4,7 @@ import { FaChevronDown } from "react-icons/fa";
 import Title from '../component/Title';
 import { shopDataContext } from '../context/ShopContext';
 import Card from '../component/Card';
-import { defaultCategories, defaultSubCategories } from '../constants/categories';
+import { defaultCategories } from '../constants/categories';
 
 function Collections() {
 
@@ -12,13 +12,9 @@ function Collections() {
     let {products,search,showSearch} = useContext(shopDataContext)
     let [filterProduct,setFilterProduct] = useState([])
     let [category,setCaterory] = useState([])
-    let [subCategory,setSubCaterory] = useState([])
     let [sortType,SetSortType] = useState("relavent")
     const categoryOptions = useMemo(() => {
         return [...new Set([...defaultCategories, ...products.map(item => item.category).filter(Boolean)])]
-    }, [products])
-    const subCategoryOptions = useMemo(() => {
-        return [...new Set([...defaultSubCategories, ...products.map(item => item.subCategory).filter(Boolean)])]
     }, [products])
 
     const toggleCategory = (e) =>{
@@ -27,15 +23,6 @@ function Collections() {
         }else
          {
             setCaterory(prev => [...prev,e.target.value])
-         }
-    }
-
-    const toggleSubCategory = (e) =>{
-         if(subCategory.includes(e.target.value)){
-            setSubCaterory(prev => prev.filter(item => item !== e.target.value))
-        }else
-         {
-            setSubCaterory(prev => [...prev,e.target.value])
          }
     }
 
@@ -48,10 +35,6 @@ function Collections() {
         if(category.length > 0)
         {
             productCopy = productCopy.filter(item => category.includes(item.category))
-        }
-        if(subCategory.length > 0)
-        {
-            productCopy = productCopy.filter(item => subCategory.includes(item.subCategory))
         }
         setFilterProduct(productCopy)
 
@@ -87,7 +70,7 @@ function Collections() {
 
     useEffect(()=>{
         applyFilter()
-    },[category,subCategory,search ,showSearch])
+    },[category,search ,showSearch])
 
 
 
@@ -108,14 +91,6 @@ function Collections() {
             <div className='w-[230px] max-h-[260px] overflow-y-auto flex items-start justify-start gap-[10px] flex-col pr-[8px]'>
                 {categoryOptions.map(item => (
                     <p className='flex items-center justify-start gap-[10px] text-[16px] font-light' key={item}> <input type="checkbox" value={item} className='w-3' onChange={toggleCategory} /> {item}</p>
-                ))}
-            </div>
-        </div>
-        <div className={`border-[2px] border-[#b8c0ba] pl-5 py-3 mt-6 rounded-md bg-[#c9d0ca] ${showFilter ? "" : "hidden"} md:block`}>
-            <p className='text-[18px] text-[#1f2a24]'>SUB-CATEGORIES</p>
-            <div className='w-[230px] max-h-[260px] overflow-y-auto flex items-start justify-start gap-[10px] flex-col pr-[8px]'>
-                {subCategoryOptions.map(item => (
-                    <p className='flex items-center justify-start gap-[10px] text-[16px] font-light' key={item}> <input type="checkbox" value={item} className='w-3' onChange={toggleSubCategory} /> {item}</p>
                 ))}
             </div>
         </div>

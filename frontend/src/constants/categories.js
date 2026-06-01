@@ -24,8 +24,6 @@ export const defaultCategories = [
   "Gift Items"
 ]
 
-export const defaultSubCategories = defaultCategories
-
 export const noSizeKey = "default"
 
 export const isWeightCategory = (value = "") => {
