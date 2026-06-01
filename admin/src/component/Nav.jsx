@@ -26,9 +26,9 @@ function Nav() {
         
     }
   return (
-    <div className='w-[100vw] h-[70px] bg-[#f8f4e8f8] z-10 fixed top-0 flex  items-center justify-between px-[30px] overflow-x-hidden shadow-md shadow-[#8f968f] '>
+    <div className='w-[100vw] h-[70px] md:h-[86px] bg-[#f8f4e8f8] z-10 fixed top-0 flex  items-center justify-between px-[30px] overflow-x-hidden shadow-md shadow-[#8f968f] '>
         <div className='w-[30%]  flex items-center justify-start   gap-[10px] cursor-pointer ' onClick={()=>navigate("/")}>
-        <img src={logo} alt=""  className='w-[52px]'/>
+        <img src={logo} alt=""  className='w-[90px] md:w-[130px] lg:w-[170px]'/>
 
        
 

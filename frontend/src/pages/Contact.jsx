@@ -23,10 +23,10 @@ function Contact() {
 
           <div className='lg:w-[80%] w-[100%] text-[#1f2a24] md:text-[16px] text-[13px]'>
             <p>Tel: +91-9876543210</p>
-            <p>Email: admin@onecart.com</p>
+            <p>Email: admin@HD Traders.com</p>
           </div>
 
-          <p className='lg:w-[80%] w-[100%] text-[15px] text-[#1f2a24] lg:text-[18px] mt-[10px] font-bold'>Careers at OneCart</p>
+          <p className='lg:w-[80%] w-[100%] text-[15px] text-[#1f2a24] lg:text-[18px] mt-[10px] font-bold'>Careers at HD Traders</p>
           <p className='lg:w-[80%] w-[100%] text-[#1f2a24] md:text-[16px] text-[13px]'>
             Learn more about our teams and job openings
           </p>

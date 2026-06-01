@@ -11,7 +11,7 @@ function Footer() {
         <div className='w-[100%] md:h-[30vh] h-[15vh] md:mb-[0px] bg-[#f8f4e8ec] flex items-center justify-center md:px-[50px] px-[5px]'>
           <div className='md:w-[30%] w-[35%] h-[100%] flex items-start justify-center flex-col gap-[5px]'>
             <div className='flex items-start justify-start gap-[5px] mt-[10px] md:mt-[40px]'>
-              <img src={logo} alt="" className='md:w-[70px] md:h-[70px] w-[55px] h-[55px]' />
+              <img src={logo} alt="" className='w-[90px] md:w-[130px] lg:w-[170px] h-auto' />
             </div>
           </div>
 
@@ -33,9 +33,9 @@ function Footer() {
             </div>
             <ul>
               <li className='text-[15px] text-[#1f2a24]'>+91-9876543210</li>
-              <li className='text-[15px] text-[#1f2a24]'>contact@onecart.com</li>
+              <li className='text-[15px] text-[#1f2a24]'>contact@HD Traders.com</li>
               <li className='text-[15px] text-[#1f2a24] hidden md:block'>+1-123-456-7890</li>
-              <li className='text-[15px] text-[#1f2a24] hidden md:block'>admin@onecart.com</li>
+              <li className='text-[15px] text-[#1f2a24] hidden md:block'>admin@HD Traders.com</li>
             </ul>
           </div>
         </div>

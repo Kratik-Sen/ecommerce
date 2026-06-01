@@ -2,7 +2,7 @@ import uploadOnCloudinary from "../config/cloudinary.js"
 import Product from "../model/productModel.js"
 import Order from "../model/orderModel.js"
 import User from "../model/userModel.js"
-import { isClothingCategory } from "../constants/categories.js"
+import { isClothingCategory, isWeightCategory } from "../constants/categories.js"
 
 
 export const addProduct = async (req,res) => {
@@ -15,7 +15,7 @@ export const addProduct = async (req,res) => {
             return res.status(400).json({message:"Product sizes must be valid JSON"})
         }
         const numericPrice = Number(price)
-        const needsSize = isClothingCategory(category) || isClothingCategory(subCategory)
+        const needsSize = isClothingCategory(category) || isClothingCategory(subCategory) || isWeightCategory(category) || isWeightCategory(subCategory)
 
         if (!name?.trim() || !description?.trim() || !category?.trim() || !subCategory?.trim()) {
             return res.status(400).json({message:"All product fields are required"})
@@ -30,7 +30,7 @@ export const addProduct = async (req,res) => {
         }
 
         if (needsSize && parsedSizes.length === 0) {
-            return res.status(400).json({message:"Select at least one size for clothing products"})
+            return res.status(400).json({message:"Select at least one size option"})
         }
 
         if (!req.files?.image1?.[0] || !req.files?.image2?.[0] || !req.files?.image3?.[0] || !req.files?.image4?.[0]) {
@@ -73,7 +73,7 @@ export const addProduct = async (req,res) => {
 export const listProduct = async (req,res) => {
      
     try {
-        const product = await Product.find({available:{$ne:false}});
+        const product = await Product.find({available:{$ne:false}}).sort({date:-1, createdAt:-1});
         return res.status(200).json(product)
 
     } catch (error) {

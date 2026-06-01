@@ -21,7 +21,7 @@ function ShopContext({children}) {
     const getProducts = async () => {
         try {
             let result = await axios.get(serverUrl + "/api/product/list")
-            setProducts(result.data)
+            setProducts(result.data.sort((a,b) => (b.date || 0) - (a.date || 0)))
         } catch (error) {
             console.log(error)
         }
@@ -73,7 +73,9 @@ function ShopContext({children}) {
        
       }
      
-    } 
+    } else {
+      toast.success("Product Added")
+    }
     }
 
 
@@ -86,7 +88,34 @@ function ShopContext({children}) {
       console.log(error)
      
 
+      
+    }
+    const syncCartAfterLogin = async () => {
+      try {
+        const result = await axios.post(serverUrl + '/api/cart/get',{},{ withCredentials: true })
+        const serverCart = result.data || {}
+        const mergedCart = structuredClone(serverCart)
 
+        for (const itemId in cartItem) {
+          if (!mergedCart[itemId]) {
+            mergedCart[itemId] = {}
+          }
+
+          for (const size in cartItem[itemId]) {
+            mergedCart[itemId][size] = (mergedCart[itemId][size] || 0) + cartItem[itemId][size]
+          }
+        }
+
+        setCartItem(mergedCart)
+
+        for (const itemId in mergedCart) {
+          for (const size in mergedCart[itemId]) {
+            await axios.post(serverUrl + "/api/cart/update", { itemId, size, quantity: mergedCart[itemId][size] }, { withCredentials: true })
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      }
     }
       
     }
@@ -144,8 +173,14 @@ function ShopContext({children}) {
     },[])
 
     useEffect(() => {
-    getUserCart()
-  },[])
+    if (userData) {
+      if (getCartCount() > 0) {
+        syncCartAfterLogin()
+      } else {
+        getUserCart()
+      }
+    }
+  },[userData])
 
 
 

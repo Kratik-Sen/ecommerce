@@ -23,10 +23,11 @@ import RateProduct from './pages/RateProduct'
 function App() {
 let {userData} = useContext(userDataContext)
 let location = useLocation()
+let isAuthPage = location.pathname === "/login" || location.pathname === "/signup"
   return (
    <>
     <ToastContainer/>
-    {userData && <Nav/>}
+    {!isAuthPage && <Nav/>}
 
    <Routes>
   <Route path='/login' 
@@ -39,24 +40,24 @@ let location = useLocation()
         : (<Registration/>)}/>
 
         <Route path='/' 
-        element={userData ? <Home/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
+        element={<Home/>}/>
       
         <Route path='/about' 
-        element={userData ? <About/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
+        element={<About/>}/>
 
         <Route path='/collection' 
-        element={userData ? <Collections/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
+        element={<Collections/>}/>
           <Route path='/product' 
-        element={userData ? <Product/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
+        element={<Product/>}/>
 
         <Route path='/contact' 
-        element={userData ? <Contact/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
+        element={<Contact/>}/>
 
  <Route path='/productdetail/:productId' 
-        element={userData ? <ProductDetail/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
+        element={<ProductDetail/>}/>
 
            <Route path='/cart' 
-        element={userData ? <Cart/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
+        element={<Cart/>}/>
 
  <Route path='/placeorder' 
         element={userData ? <PlaceOrder/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
@@ -71,7 +72,7 @@ let location = useLocation()
         <Route path='*' element={<NotFound/>}/>
 
    </Routes>
-    {userData && <Ai />}
+    {!isAuthPage && <Ai />}
    </>
   )
 }

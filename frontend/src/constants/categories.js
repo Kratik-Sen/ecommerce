@@ -27,3 +27,7 @@ export const defaultCategories = [
 export const defaultSubCategories = defaultCategories
 
 export const noSizeKey = "default"
+
+export const isWeightCategory = (value = "") => {
+  return String(value || "").toLowerCase().includes("health")
+}

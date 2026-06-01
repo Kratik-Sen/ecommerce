@@ -42,3 +42,7 @@ export const isClothingCategory = (value = "") => {
   const normalizedValue = String(value || "").toLowerCase()
   return clothingCategoryKeywords.some(keyword => normalizedValue.includes(keyword))
 }
+
+export const isWeightCategory = (value = "") => {
+  return String(value || "").toLowerCase().includes("health")
+}

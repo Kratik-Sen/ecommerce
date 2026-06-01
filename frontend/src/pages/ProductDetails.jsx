@@ -10,6 +10,7 @@ import { authDataContext } from '../context/AuthContext';
 import { userDataContext } from '../context/UserContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { isWeightCategory } from '../constants/categories';
 
 function ProductDetail() {
     let {productId} = useParams()
@@ -29,6 +30,7 @@ function ProductDetail() {
   const [size, setSize] = useState('')
   const sizeOptions = Array.isArray(productData?.sizes) ? productData.sizes : []
   const hasSizeOptions = sizeOptions.length > 0
+  const hasWeightOptions = isWeightCategory(productData?.category) || isWeightCategory(productData?.subCategory)
   const ratings = Array.isArray(productData?.ratings) ? productData.ratings : []
   const reviewCount = ratings.length
   const averageRating = reviewCount ? ratings.reduce((total,item)=>total + Number(item.rating || 0),0) / reviewCount : 0
@@ -142,7 +144,7 @@ function ProductDetail() {
                 <p className=' w-[80%] md:w-[60%] text-[20px] font-semibold pl-[5px] text-[#1f2a24]'>{productData.description}</p>
                 <div className='flex flex-col gap-[10px] my-[10px] '>
                   {hasSizeOptions && <>
-                    <p className='text-[25px] font-semibold pl-[5px] text-[#1f2a24]'>Select Size</p>
+                    <p className='text-[25px] font-semibold pl-[5px] text-[#1f2a24]'>{hasWeightOptions ? "Select Weight" : "Select Size"}</p>
           <div className='flex gap-2'>
             {
               sizeOptions.map((item, index) => (

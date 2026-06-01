@@ -7,7 +7,7 @@ import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loading from '../component/Loading'
-import { defaultCategories, defaultSubCategories, isClothingCategory } from '../constants/categories'
+import { defaultCategories, defaultSubCategories, isClothingCategory, isWeightCategory } from '../constants/categories'
 
 const getSavedOptions = (key, defaults) => {
   try {
@@ -35,9 +35,12 @@ function Add() {
   const [customSubCategory, setCustomSubCategory] = useState("")
   const [bestseller, setBestSeller] = useState(false)
   const [sizes,setSizes] = useState([])
+  const [customWeight,setCustomWeight] = useState("")
   const [loading,setLoading] = useState(false)
   let {serverUrl} = useContext(authDataContext)
-  const hasSizeOptions = isClothingCategory(category) || isClothingCategory(subCategory)
+  const hasClothingSizes = isClothingCategory(category) || isClothingCategory(subCategory)
+  const hasWeightSizes = isWeightCategory(category) || isWeightCategory(subCategory)
+  const hasSizeOptions = hasClothingSizes || hasWeightSizes
 
   useEffect(() => {
     localStorage.setItem("adminCategories", JSON.stringify(categoryOptions.filter(item => !defaultCategories.includes(item))))
@@ -115,7 +118,7 @@ function Add() {
       }
 
       if (hasSizeOptions && sizes.length === 0) {
-        toast.error("Select at least one size for clothing products")
+        toast.error("Select at least one size option")
         setLoading(false)
         return
       }
@@ -148,6 +151,8 @@ function Add() {
       setImage4(false)
       setPrice("")
       setBestSeller(false)
+      setSizes([])
+      setCustomWeight("")
       setCategory(defaultCategories[0])
       setSubCategory(defaultSubCategories[0])
       }
@@ -256,7 +261,7 @@ function Add() {
        </div>
 
 
-       {hasSizeOptions && <div className='w-[80%] h-[220px] md:h-[100px] flex items-start justify-center flex-col gap-[10px] py-[10px] md:py-[0px]'>
+       {hasClothingSizes && <div className='w-[80%] h-[220px] md:h-[100px] flex items-start justify-center flex-col gap-[10px] py-[10px] md:py-[0px]'>
         <p className='text-[20px] md:text-[25px]  font-semibold'>Product Size</p>
 
         <div className='flex items-center justify-start gap-[15px] flex-wrap'>
@@ -271,6 +276,28 @@ function Add() {
           <div className={`px-[20px] py-[7px] rounded-lg bg-[#c9d0ca] text-[18px] hover:border-[#74c69d] border-[2px] cursor-pointer ${sizes.includes("XXL") ? "bg-[#b7e4c7] text-[#1f2a24] border-[#74c69d]" : ""}`} onClick={()=>setSizes(prev => prev.includes("XXL") ? prev.filter(item => item !== "XXL") : [...prev , "XXL"])}>XXL</div>
         </div>
 
+       </div>}
+
+       {hasWeightSizes && <div className='w-[80%] min-h-[150px] flex items-start justify-center flex-col gap-[10px] py-[10px]'>
+        <p className='text-[20px] md:text-[25px] font-semibold'>Weight Options in Grams</p>
+        <div className='w-[600px] max-w-[98%] flex gap-[10px] flex-wrap'>
+          <input type="number" min="1" placeholder='Enter grams' className='w-[220px] h-[40px] rounded-lg hover:border-[#74c69d] border-[2px] cursor-pointer bg-[#c9d0ca] px-[20px] text-[18px] placeholder:text-[#6d766f]' value={customWeight} onChange={(e)=>setCustomWeight(e.target.value)} />
+          <button type='button' className='px-[18px] py-[8px] rounded-lg bg-[#b7e4c7] border-[1px] border-[#74c69d]' onClick={()=>{
+            const weight = Number(customWeight)
+            if (!weight || weight <= 0) {
+              toast.error("Enter valid grams")
+              return
+            }
+            const weightLabel = `${weight}g`
+            setSizes(prev => prev.includes(weightLabel) ? prev : [...prev, weightLabel])
+            setCustomWeight("")
+          }}>Add Weight</button>
+        </div>
+        <div className='flex items-center justify-start gap-[15px] flex-wrap'>
+          {sizes.map(item => (
+            <button type='button' key={item} className='px-[20px] py-[7px] rounded-lg bg-[#b7e4c7] text-[18px] border-[2px] border-[#74c69d] cursor-pointer' onClick={()=>setSizes(prev => prev.filter(size => size !== item))}>{item} ×</button>
+          ))}
+        </div>
        </div>}
 
        <div className='w-[80%] flex items-center justify-start gap-[10px] mt-[20px]'>

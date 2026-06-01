@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Title from '../component/Title'
 import CartTotal from '../component/CartTotal'
 import razorpay from '../assets/Razorpay.jpg'
@@ -15,6 +15,7 @@ function PlaceOrder() {
     const {cartItem , setCartItem , getCartAmount , delivery_fee , products } = useContext(shopDataContext)
     let {serverUrl} = useContext(authDataContext)
     let [loading ,setLoading] = useState(false)
+    let [razorpayKeyId,setRazorpayKeyId] = useState("")
 
     let [formData,setFormData] = useState({
         firstName:'',
@@ -35,8 +36,12 @@ function PlaceOrder() {
     }
 
     const initPay = (order) =>{
+        if (!razorpayKeyId) {
+          toast.error("Razorpay is not configured")
+          return
+        }
         const options = {
-      key:import.meta.env.VITE_RAZORPAY_KEY_ID,
+      key:razorpayKeyId,
       amount: order.amount,
       currency: order.currency,
       name:'Order Payment',
@@ -71,6 +76,19 @@ function PlaceOrder() {
     })
     rzp.open()
    }
+
+   const getRazorpayKey = async () => {
+    try {
+      const result = await axios.get(serverUrl + '/api/settings/razorpay/public')
+      setRazorpayKeyId(result.data.keyId || "")
+    } catch (error) {
+      console.log(error)
+    }
+   }
+
+   useEffect(() => {
+    getRazorpayKey()
+   }, [])
 
     
      const onSubmitHandler = async (e) => {

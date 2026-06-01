@@ -3,13 +3,26 @@ import User from "../model/userModel.js";
 import razorpay from 'razorpay'
 import dotenv from 'dotenv'
 import crypto from 'crypto'
+import { getSettingsDocument } from './settingsController.js'
 dotenv.config()
 const currency = 'inr'
-const razorpayInstance = new razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-})
 const pendingRazorpayOrders = new Map()
+
+const getRazorpayConfig = async () => {
+    const settings = await getSettingsDocument()
+    if (!settings.razorpayKeyId || !settings.razorpayKeySecret) {
+        throw new Error("Razorpay settings are not configured")
+    }
+
+    return {
+        keyId:settings.razorpayKeyId,
+        keySecret:settings.razorpayKeySecret,
+        instance:new razorpay({
+            key_id: settings.razorpayKeyId,
+            key_secret: settings.razorpayKeySecret
+        })
+    }
+}
 
 // for User
 export const placeOrder = async (req,res) => {
@@ -61,7 +74,8 @@ export const placeOrderRazorpay = async (req,res) => {
             currency: currency.toUpperCase(),
             receipt : `rcpt_${Date.now()}`
          }
-         const order = await razorpayInstance.orders.create(options)
+         const {instance} = await getRazorpayConfig()
+         const order = await instance.orders.create(options)
          pendingRazorpayOrders.set(order.id, orderData)
          res.status(200).json(order)
     } catch (error) {
@@ -78,8 +92,9 @@ export const verifyRazorpay = async (req,res) =>{
         const {razorpay_order_id, razorpay_payment_id, razorpay_signature} = req.body
 
         const sign = `${razorpay_order_id}|${razorpay_payment_id}`
+        const {instance, keySecret} = await getRazorpayConfig()
         const expectedSignature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .createHmac('sha256', keySecret)
             .update(sign)
             .digest('hex')
 
@@ -98,7 +113,7 @@ export const verifyRazorpay = async (req,res) =>{
             return res.status(400).json({message:'Order payment session expired'})
         }
 
-        const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)
+        const orderInfo = await instance.orders.fetch(razorpay_order_id)
         if(orderInfo.status === 'paid'){
             const existingOrder = await Order.findOne({razorpayOrderId: razorpay_order_id, userId})
             if (!existingOrder) {

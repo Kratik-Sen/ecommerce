@@ -15,6 +15,7 @@ function Lists() {
     price: "",
     category: "",
     subCategory: "",
+    sizes: "",
     bestseller: false,
   })
   const { serverUrl } = useContext(authDataContext)
@@ -59,6 +60,7 @@ function Lists() {
       price: product.price || "",
       category: product.category || "",
       subCategory: product.subCategory || "",
+      sizes: Array.isArray(product.sizes) ? product.sizes.join(", ") : "",
       bestseller: !!product.bestseller,
     })
   }
@@ -78,6 +80,7 @@ function Lists() {
       formData.append("price", editData.price)
       formData.append("category", editData.category.trim())
       formData.append("subCategory", editData.subCategory.trim())
+      formData.append("sizes", JSON.stringify(editData.sizes.split(",").map(item => item.trim()).filter(Boolean)))
       formData.append("bestseller", editData.bestseller)
 
       const result = await axios.post(`${serverUrl}/api/product/update/${editingProduct._id}`, formData, { withCredentials: true })
@@ -117,6 +120,7 @@ function Lists() {
                 <input name='price' type='number' value={editData.price} onChange={updateEditData} className='w-[180px] h-[42px] rounded-lg bg-[#c9d0ca] px-[14px]' placeholder='Price' required />
                 <input name='category' value={editData.category} onChange={updateEditData} className='w-[220px] h-[42px] rounded-lg bg-[#c9d0ca] px-[14px]' placeholder='Category' required />
                 <input name='subCategory' value={editData.subCategory} onChange={updateEditData} className='w-[220px] h-[42px] rounded-lg bg-[#c9d0ca] px-[14px]' placeholder='Sub-category' required />
+                <input name='sizes' value={editData.sizes} onChange={updateEditData} className='w-[260px] h-[42px] rounded-lg bg-[#c9d0ca] px-[14px]' placeholder='Sizes, e.g. S, M or 250g, 500g' />
               </div>
               <label className='flex items-center gap-[10px] text-[16px]'>
                 <input type='checkbox' name='bestseller' checked={editData.bestseller} onChange={updateEditData} className='w-[20px] h-[20px]' />

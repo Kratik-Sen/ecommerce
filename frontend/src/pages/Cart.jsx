@@ -5,9 +5,12 @@ import { useNavigate } from 'react-router-dom'
 import { RiDeleteBin6Line } from "react-icons/ri";
 import CartTotal from '../component/CartTotal';
 import { noSizeKey } from '../constants/categories';
+import { userDataContext } from '../context/UserContext';
+import { toast } from 'react-toastify';
 
 function Cart() {
     const { products, currency, cartItem ,updateQuantity } = useContext(shopDataContext)
+  const { userData } = useContext(userDataContext)
   const [cartData, setCartData] = useState([])
   const navigate = useNavigate()
 
@@ -51,7 +54,7 @@ function Cart() {
                     <p className='md:text-[25px] text-[20px] text-[#1f2a24]'>{productData.name}</p>
                     <div className='flex items-center   gap-[20px]'>
                       <p className='text-[20px] text-[#4f8f67]'>{currency} {productData.price}</p>
-                      {hasSize && <p className='w-[40px] h-[40px] text-[16px] text-[#1f2a24] 
+                      {hasSize && <p className='min-w-[54px] h-[40px] px-[8px] text-[16px] text-[#1f2a24] 
                       bg-[#c9d0cab4] rounded-md mt-[5px] flex items-center justify-center border-[1px] border-[#95d5b2]'>{item.size}</p>}
                 </div>
                 </div>
@@ -70,7 +73,10 @@ function Cart() {
         <div className='w-full sm:w-[450px]'>
             <CartTotal/>
             <button className='text-[18px] hover:bg-[#aeb7b1] cursor-pointer bg-[#c9d0ca80] py-[10px] px-[50px] rounded-2xl text-[#1f2a24] flex items-center justify-center gap-[20px]  border-[1px] border-[#b8c0ba] ml-[30px] mt-[20px]' onClick={()=>{
-                if (cartData.length > 0) {
+                if (!userData) {
+      toast.error("Please login to place order")
+      navigate("/login", {state:{from:"/placeorder"}})
+    } else if (cartData.length > 0) {
       navigate("/placeorder");
     } else {
       console.log("Your cart is empty!");

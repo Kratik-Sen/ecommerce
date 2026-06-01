@@ -73,13 +73,16 @@ window.speechSynthesis.speak(utterence)
    setActiveAi(false)
   }
   return (
-    <div className='fixed lg:bottom-[20px] md:bottom-[40px] bottom-[80px] left-[2%] ' onClick={()=>{recognition.start();
+    <div className='fixed lg:bottom-[20px] md:bottom-[40px] bottom-[80px] left-[2%] flex items-end gap-[8px] z-20' onClick={()=>{recognition.start();
     openingSound.play()
     setActiveAi(true)
     }}>
       <img src={ai} alt="" className={`w-[100px] cursor-pointer ${activeAi ? 'translate-x-[10%] translate-y-[-10%] scale-125 ' : 'translate-x-[0] translate-y-[0] scale-100'} transition-transform` } style={{
         filter: ` ${activeAi?"drop-shadow(0px 0px 30px #95d5b2)":"drop-shadow(0px 0px 20px #8f968f)"}`
       }}/>
+      <div className='max-w-[210px] bg-[#fffaf0f2] border-[1px] border-[#b8c0ba] rounded-xl px-[12px] py-[8px] text-[12px] md:text-[14px] text-[#1f2a24] shadow-md shadow-[#8f968f] mb-[18px]'>
+        Click me and say "open collection page"
+      </div>
     </div>
   )
 }
