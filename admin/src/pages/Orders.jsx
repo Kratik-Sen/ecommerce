@@ -8,6 +8,8 @@ import axios from 'axios'
 import { useEffect } from 'react'
 import { SiEbox } from "react-icons/si";
 
+const noSizeKey = "default"
+
 function Orders() {
 
   let [orders,setOrders] = useState([])
@@ -54,11 +56,12 @@ function Orders() {
               <div className='flex items-start justify-center flex-col gap-[5px] text-[16px] text-[#2f6f4e]'>
                 {
                   order.items.map((item,index)=>{
+                    const sizeText = item.size && item.size !== noSizeKey ? ` ${item.size}` : ""
                     if(index === order.items.length - 1){
-                       return <p key={index}>{item.name.toUpperCase()}  *  {item.quantity} <span>{item.size}</span></p>
+                       return <p key={index}>{item.name.toUpperCase()}  *  {item.quantity}<span>{sizeText}</span></p>
 
                     }else{
-                       return <p key={index}>{item.name.toUpperCase()}  *  {item.quantity} <span>{item.size}</span>,</p>
+                       return <p key={index}>{item.name.toUpperCase()}  *  {item.quantity}<span>{sizeText}</span>,</p>
 
                     }
                   })

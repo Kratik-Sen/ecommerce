@@ -7,7 +7,7 @@ import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loading from '../component/Loading'
-import { defaultCategories, defaultSubCategories } from '../constants/categories'
+import { defaultCategories, defaultSubCategories, isClothingCategory } from '../constants/categories'
 
 const getSavedOptions = (key, defaults) => {
   try {
@@ -36,6 +36,7 @@ function Add() {
   const [sizes,setSizes] = useState([])
   const [loading,setLoading] = useState(false)
   let {serverUrl} = useContext(authDataContext)
+  const hasSizeOptions = isClothingCategory(category) || isClothingCategory(subCategory)
 
   useEffect(() => {
     localStorage.setItem("adminCategories", JSON.stringify(categoryOptions.filter(item => !defaultCategories.includes(item))))
@@ -44,6 +45,12 @@ function Add() {
   useEffect(() => {
     localStorage.setItem("adminSubCategories", JSON.stringify(subCategoryOptions.filter(item => !defaultSubCategories.includes(item))))
   }, [subCategoryOptions])
+
+  useEffect(() => {
+    if (!hasSizeOptions) {
+      setSizes([])
+    }
+  }, [hasSizeOptions])
 
   const addCustomOption = (value, options, setOptions, setSelected, resetInput, label) => {
     const trimmedValue = value.trim()
@@ -67,14 +74,38 @@ function Add() {
     setLoading(true)
     e.preventDefault()
     try {
+      if (!name.trim() || !description.trim() || !category.trim() || !subCategory.trim()) {
+        toast.error("Fill all product details")
+        setLoading(false)
+        return
+      }
+
+      if (!Number(price) || Number(price) <= 0) {
+        toast.error("Enter a valid product price")
+        setLoading(false)
+        return
+      }
+
+      if (!image1 || !image2 || !image3 || !image4) {
+        toast.error("Upload all product images")
+        setLoading(false)
+        return
+      }
+
+      if (hasSizeOptions && sizes.length === 0) {
+        toast.error("Select at least one size for clothing products")
+        setLoading(false)
+        return
+      }
+
       let formData = new FormData()
-      formData.append("name",name)
-      formData.append("description",description)
+      formData.append("name",name.trim())
+      formData.append("description",description.trim())
       formData.append("price",price)
       formData.append("category",category)
       formData.append("subCategory",subCategory)
       formData.append("bestseller",bestseller)
-      formData.append("sizes",JSON.stringify(sizes))
+      formData.append("sizes",JSON.stringify(hasSizeOptions ? sizes : []))
       formData.append("image1",image1)
       formData.append("image2",image2)
       formData.append("image3",image3)
@@ -201,7 +232,7 @@ function Add() {
        </div>
 
 
-       <div className='w-[80%] h-[220px] md:h-[100px] flex items-start justify-center flex-col gap-[10px] py-[10px] md:py-[0px]'>
+       {hasSizeOptions && <div className='w-[80%] h-[220px] md:h-[100px] flex items-start justify-center flex-col gap-[10px] py-[10px] md:py-[0px]'>
         <p className='text-[20px] md:text-[25px]  font-semibold'>Product Size</p>
 
         <div className='flex items-center justify-start gap-[15px] flex-wrap'>
@@ -216,7 +247,7 @@ function Add() {
           <div className={`px-[20px] py-[7px] rounded-lg bg-[#c9d0ca] text-[18px] hover:border-[#74c69d] border-[2px] cursor-pointer ${sizes.includes("XXL") ? "bg-[#b7e4c7] text-[#1f2a24] border-[#74c69d]" : ""}`} onClick={()=>setSizes(prev => prev.includes("XXL") ? prev.filter(item => item !== "XXL") : [...prev , "XXL"])}>XXL</div>
         </div>
 
-       </div>
+       </div>}
 
        <div className='w-[80%] flex items-center justify-start gap-[10px] mt-[20px]'>
         <input type="checkbox" id='checkbox' className='w-[25px] h-[25px] cursor-pointer' onChange={()=>setBestSeller(prev => !prev)}/>

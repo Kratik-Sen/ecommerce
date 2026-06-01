@@ -4,6 +4,7 @@ import { shopDataContext } from '../context/ShopContext'
 import { useNavigate } from 'react-router-dom'
 import { RiDeleteBin6Line } from "react-icons/ri";
 import CartTotal from '../component/CartTotal';
+import { noSizeKey } from '../constants/categories';
 
 function Cart() {
     const { products, currency, cartItem ,updateQuantity } = useContext(shopDataContext)
@@ -37,6 +38,10 @@ function Cart() {
         {
          cartData.map((item,index)=>{
              const productData = products.find((product) => product._id === item._id);
+             if (!productData) {
+              return null
+             }
+             const hasSize = item.size && item.size !== noSizeKey
             
              return (
               <div key={index} className='w-[100%] h-[10%] border-t border-b  '>
@@ -46,8 +51,8 @@ function Cart() {
                     <p className='md:text-[25px] text-[20px] text-[#1f2a24]'>{productData.name}</p>
                     <div className='flex items-center   gap-[20px]'>
                       <p className='text-[20px] text-[#4f8f67]'>{currency} {productData.price}</p>
-                      <p className='w-[40px] h-[40px] text-[16px] text-[#1f2a24] 
-                      bg-[#c9d0cab4] rounded-md mt-[5px] flex items-center justify-center border-[1px] border-[#95d5b2]'>{item.size}</p>
+                      {hasSize && <p className='w-[40px] h-[40px] text-[16px] text-[#1f2a24] 
+                      bg-[#c9d0cab4] rounded-md mt-[5px] flex items-center justify-center border-[1px] border-[#95d5b2]'>{item.size}</p>}
                 </div>
                 </div>
                 <input type="number" min={1} defaultValue={item.quantity} className=' md:max-w-20 max-w-10 md:px-2 md:py-2 py-[5px] px-[10px] text-[#1f2a24] text-[18px] font-semibold bg-[#c9d0cab4] absolute md:top-[40%] top-[46%] left-[75%] md:left-[50%] border-[1px] border-[#95d5b2] rounded-md '  onChange={(e)=> (e.target.value === ' ' || e.target.value === '0') ? null  :  updateQuantity(item._id,item.size,Number(e.target.value))} />

@@ -17,6 +17,8 @@ function ProductDetail() {
   const [image3, setImage3] = useState('')
   const [image4, setImage4] = useState('')
   const [size, setSize] = useState('')
+  const sizeOptions = Array.isArray(productData?.sizes) ? productData.sizes : []
+  const hasSizeOptions = sizeOptions.length > 0
 
 
 
@@ -30,6 +32,7 @@ function ProductDetail() {
         setImage3(item.image3)
         setImage4(item.image4)
         setImage(item.image1)
+        setSize('')
 
         return null;
       }
@@ -78,15 +81,17 @@ function ProductDetail() {
 
                 <p className=' w-[80%] md:w-[60%] text-[20px] font-semibold pl-[5px] text-[#1f2a24]'>{productData.description} and Stylish, breathable cotton shirt with a modern slim fit. Easy to wash, super comfortable, and designed for effortless style.</p>
                 <div className='flex flex-col gap-[10px] my-[10px] '>
+                  {hasSizeOptions && <>
                     <p className='text-[25px] font-semibold pl-[5px] text-[#1f2a24]'>Select Size</p>
           <div className='flex gap-2'>
             {
-              productData.sizes.map((item, index) => (
+              sizeOptions.map((item, index) => (
                 <button key={index} className={`border py-2 px-4 bg-[#fffaf0] rounded-md 
                   ${item === size ? 'bg-[#95d5b2] text-[#1f2a24] text-[20px]' : ''}`} onClick={() => setSize(item)}  >{item}</button>
               ))
             }
           </div>
+                  </>}
            <button className='text-[16px] active:bg-[#aeb7b1] cursor-pointer bg-[#b7e4c7] py-[10px] px-[20px] rounded-2xl mt-[10px] border-[1px] border-[#b8c0ba] text-[#1f2a24] shadow-md shadow-[#8f968f]' onClick={()=>addtoCart(productData._id , size)} >{loading? <Loading/> : "Add to Cart"}</button>
                 </div>
             <div className='w-[90%] h-[1px] bg-[#c9d0ca]'></div>

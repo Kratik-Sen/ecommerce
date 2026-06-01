@@ -25,3 +25,20 @@ export const defaultCategories = [
 ]
 
 export const defaultSubCategories = defaultCategories
+
+export const clothingCategoryKeywords = [
+  "fashion",
+  "clothing",
+  "cloth",
+  "wear",
+  "shirt",
+  "jeans",
+  "dress",
+  "kurta",
+  "saree"
+]
+
+export const isClothingCategory = (value = "") => {
+  const normalizedValue = String(value || "").toLowerCase()
+  return clothingCategoryKeywords.some(keyword => normalizedValue.includes(keyword))
+}

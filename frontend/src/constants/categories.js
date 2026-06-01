@@ -25,3 +25,5 @@ export const defaultCategories = [
 ]
 
 export const defaultSubCategories = defaultCategories
+
+export const noSizeKey = "default"

@@ -3,6 +3,7 @@ import Title from '../component/Title'
 import { shopDataContext } from '../context/ShopContext'
 import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
+import { noSizeKey } from '../constants/categories'
 
 function Order() {
     let [orderData,setOrderData] = useState([])
@@ -49,9 +50,9 @@ useEffect(()=>{
                     <div className='flex items-start justify-center flex-col gap-[5px]'>
                     <p className='md:text-[25px] text-[20px] text-[#1f2a24]'>{item.name}</p>
                     <div className='flex items-center gap-[8px]   md:gap-[20px]'>
-                        <p className='md:text-[18px] text-[12px] text-[#4f8f67]'>{currency} {item.price}</p>
+                      <p className='md:text-[18px] text-[12px] text-[#4f8f67]'>{currency} {item.price}</p>
                       <p className='md:text-[18px] text-[12px] text-[#4f8f67]'>Quantity: {item.quantity}</p>
-                      <p className='md:text-[18px] text-[12px] text-[#4f8f67]'>Size: {item.size}</p>
+                      {item.size && item.size !== noSizeKey && <p className='md:text-[18px] text-[12px] text-[#4f8f67]'>Size: {item.size}</p>}
                     </div>
                     <div className='flex items-center'>
                      <p className='md:text-[18px] text-[12px] text-[#4f8f67]'>Date: <span className='text-[#59645d] pl-[10px] md:text-[16px] text-[11px]'>{new Date(item.date).toDateString()}</span></p>

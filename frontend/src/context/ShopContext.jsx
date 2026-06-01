@@ -3,6 +3,7 @@ import { authDataContext } from './AuthContext'
 import axios from 'axios'
 import { userDataContext } from './UserContext'
 import { toast } from 'react-toastify'
+import { noSizeKey } from '../constants/categories'
 
  export const shopDataContext = createContext()
 function ShopContext({children}) {
@@ -29,22 +30,26 @@ function ShopContext({children}) {
 
 
     const addtoCart = async (itemId , size) => {
-       if (!size) {
-      console.log("Select Product Size");
+      const product = products.find(item => item._id === itemId)
+      const hasSizeOptions = Array.isArray(product?.sizes) && product.sizes.length > 0
+      const selectedSize = hasSizeOptions ? size : noSizeKey
+
+       if (hasSizeOptions && !size) {
+      toast.error("Select Product Size");
       return;
     }
 
     let cartData = structuredClone(cartItem); // Clone the product
 
     if (cartData[itemId]) {
-      if (cartData[itemId][size]) {
-        cartData[itemId][size] += 1;
+      if (cartData[itemId][selectedSize]) {
+        cartData[itemId][selectedSize] += 1;
       } else {
-        cartData[itemId][size] = 1;
+        cartData[itemId][selectedSize] = 1;
       }
     } else {
       cartData[itemId] = {};
-      cartData[itemId][size] = 1;
+      cartData[itemId][selectedSize] = 1;
     }
   
     setCartItem(cartData);
@@ -53,7 +58,7 @@ function ShopContext({children}) {
     if (userData) {
       setLoading(true)
       try {
-      let result = await axios.post(serverUrl + "/api/cart/add" , {itemId,size} , {withCredentials: true})
+      let result = await axios.post(serverUrl + "/api/cart/add" , {itemId,size:selectedSize} , {withCredentials: true})
       console.log(result.data)
       toast.success("Product Added")
       setLoading(false)
