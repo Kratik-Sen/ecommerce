@@ -1,8 +1,6 @@
 import React, { useContext, useState } from 'react'
 import logo from '../assets/logo.png'
-import { IoSearchCircleOutline, IoSearchCircleSharp } from "react-icons/io5"
-import { FaCircleUser } from "react-icons/fa6"
-import { MdOutlineShoppingCart } from "react-icons/md"
+import { FiChevronDown, FiSearch, FiShoppingCart, FiUser } from "react-icons/fi"
 import { IoMdHome } from "react-icons/io"
 import { HiOutlineCollection } from "react-icons/hi"
 import { MdAssignment, MdContacts } from "react-icons/md"
@@ -13,83 +11,95 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 function Nav() {
-  const { getCurrentUser, userData, setUserData } = useContext(userDataContext)
+  const { userData, setUserData } = useContext(userDataContext)
   const { serverUrl } = useContext(authDataContext)
   const { showSearch, setShowSearch, search, setSearch, getCartCount } = useContext(shopDataContext)
   const [showProfile, setShowProfile] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
-  const navButtonClass = (path) => {
-    const active = path === "/" ? location.pathname === "/" : location.pathname.startsWith(path)
-    return `text-[15px] hover:bg-[#aeb7b1] cursor-pointer ${active ? "bg-[#c0c0c0]" : "bg-[#b7e4c7]"} py-[10px] px-[14px] rounded-2xl`
-  }
-  const mobileButtonClass = (path) => {
-    const active = path === "/" ? location.pathname === "/" : location.pathname.startsWith(path)
-    return `text-[#1f2a24] flex items-center justify-center flex-col gap-[2px] ${active ? "bg-[#c0c0c0]" : ""} rounded-lg px-[6px] py-[4px]`
-  }
+
+  const navItems = [
+    { label: "HOME", path: "/" },
+    { label: "COLLECTIONS", path: "/collection" },
+    { label: "ORDERS", path: "/order", protected: true },
+    { label: "ABOUT", path: "/about" },
+    { label: "CONTACT", path: "/contact" }
+  ]
+
+  const isActive = (path) => path === "/" ? location.pathname === "/" : location.pathname.startsWith(path)
+  const goTo = (item) => navigate(item.protected && !userData ? "/login" : item.path)
 
   const handleLogout = async () => {
     try {
-      const result = await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true })
-      console.log(result.data)
-      setUserData(null)         // ✅ Instantly update UI after logout
+      await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true })
+      setUserData(null)
+      setShowProfile(false)
       navigate("/login")
     } catch (error) {
       console.log(error)
     }
   }
 
+  const mobileButtonClass = (path) => {
+    return `flex min-w-[54px] items-center justify-center rounded-xl px-[6px] py-[6px] text-[11px] text-[#1f2a24] ${isActive(path) ? "bg-[#fffaf0] shadow-sm" : ""}`
+  }
+
   return (
-    <div className='w-[100vw] h-[70px] md:h-[86px] bg-[#f8f4e8ec] z-10 fixed top-0 flex items-center justify-between px-[16px] md:px-[30px] shadow-md shadow-[#8f968f]'>
-      <div className='w-[18%] lg:w-[24%] flex items-center justify-start gap-[10px]'>
-        <img src={logo} alt="" className='w-[90px] md:w-[130px] lg:w-[170px] cursor-pointer' onClick={() => navigate("/")} />
-      </div>
+    <>
+      <header className='fixed left-0 right-0 top-0 z-30 px-[12px] pt-[10px] md:px-[28px]'>
+        <div className='mx-auto flex h-[66px] w-full max-w-[1360px] items-center justify-between rounded-[24px] border-[1px] border-[#e0d9c9] bg-[#fffaf0ef] px-[18px] shadow-lg shadow-[#8f968f33] backdrop-blur md:h-[82px] md:px-[34px]'>
+          <img src={logo} alt="HD Traders" className='h-[48px] w-auto cursor-pointer object-contain md:h-[64px]' onClick={() => navigate("/")} />
 
-      <div className='w-[64%] lg:w-[56%] hidden md:flex'>
-        <ul className='flex items-center justify-center gap-[12px] text-[#1f2a24]'>
-          <li className={navButtonClass("/")} onClick={() => navigate("/")}>HOME</li>
-          <li className={navButtonClass("/collection")} onClick={() => navigate("/collection")}>COLLECTIONS</li>
-          <li className={navButtonClass("/order")} onClick={() => navigate(userData ? "/order" : "/login")}>ORDERS</li>
-          <li className={navButtonClass("/about")} onClick={() => navigate("/about")}>ABOUT</li>
-          <li className={navButtonClass("/contact")} onClick={() => navigate("/contact")}>CONTACT</li>
-        </ul>
-      </div>
+          <nav className='hidden items-center gap-[30px] lg:flex'>
+            {navItems.map(item => (
+              <button key={item.path} type='button' onClick={() => goTo(item)} className={`relative text-[14px] font-medium tracking-[0px] text-[#1f2a24] transition hover:text-[#2f6f4e] ${isActive(item.path) ? "text-[#2f6f4e]" : ""}`}>
+                <span className='inline-flex items-center gap-[4px]'>{item.label}{item.label === "COLLECTIONS" && <FiChevronDown className='text-[13px]' />}</span>
+                {isActive(item.path) && <span className='absolute left-0 right-0 top-[28px] mx-auto h-[2px] w-full rounded-full bg-[#2f6f4e]'></span>}
+              </button>
+            ))}
+          </nav>
 
-      <div className='w-[18%] lg:w-[20%] flex items-center justify-end gap-[20px]'>
-        {!showSearch && <IoSearchCircleOutline className='w-[38px] h-[38px] text-[#1f2a24] cursor-pointer' onClick={() => setShowSearch(prev => !prev)} />}
-        {showSearch && <IoSearchCircleSharp className='w-[38px] h-[38px] text-[#1f2a24] cursor-pointer' onClick={() => setShowSearch(prev => !prev)} />}
-        {!userData && <FaCircleUser className='w-[29px] h-[29px] text-[#1f2a24] cursor-pointer' onClick={() => navigate("/login")} />}
-        {userData && <div className='flex items-center gap-[8px] cursor-pointer' onClick={() => setShowProfile(prev => !prev)}>
-          <div className='w-[30px] h-[30px] bg-[#95d5b2] text-[#1f2a24] rounded-full flex items-center justify-center'>{userData?.name.slice(0, 1)}</div>
-          <span className='hidden lg:block text-[#1f2a24] text-[15px] max-w-[120px] truncate'>{userData?.name}</span>
-        </div>}
-        <MdOutlineShoppingCart className='w-[30px] h-[30px] text-[#1f2a24] cursor-pointer hidden md:block' onClick={() => navigate("/cart")} />
-        <p className='absolute w-[18px] h-[18px] items-center justify-center bg-[#95d5b2] px-[5px] py-[2px] text-[#1f2a24] rounded-full text-[9px] top-[10px] right-[23px] hidden md:block'>{getCartCount()}</p>
-      </div>
+          <div className='flex items-center justify-end gap-[14px] text-[#1f2a24] md:gap-[22px]'>
+            <button type='button' className={`text-[24px] transition hover:text-[#2f6f4e] ${showSearch ? "text-[#2f6f4e]" : ""}`} onClick={() => setShowSearch(prev => !prev)} aria-label='Search'>
+              <FiSearch />
+            </button>
+            {!userData && <button type='button' className='hidden text-[23px] transition hover:text-[#2f6f4e] md:block' onClick={() => navigate("/login")} aria-label='Login'><FiUser /></button>}
+            {userData && (
+              <button type='button' className='hidden items-center gap-[9px] md:flex' onClick={() => setShowProfile(prev => !prev)}>
+                <span className='flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#95d5b2] text-[14px] font-semibold text-[#1f2a24]'>{userData?.name?.slice(0, 1)}</span>
+                <span className='hidden max-w-[110px] truncate text-[14px] lg:block'>{userData?.name}</span>
+                <FiChevronDown className='hidden text-[13px] lg:block' />
+              </button>
+            )}
+            <button type='button' className='relative hidden text-[25px] transition hover:text-[#2f6f4e] md:block' onClick={() => navigate("/cart")} aria-label='Cart'>
+              <FiShoppingCart />
+              <span className='absolute right-[-8px] top-[-9px] flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#95d5b2] px-[4px] text-[10px] font-semibold text-[#1f2a24]'>{getCartCount()}</span>
+            </button>
+          </div>
 
-      {showSearch && (
-        <div className='w-[100%] h-[80px] bg-[#d8ded8dd] absolute top-[100%] left-0 right-0 flex items-center justify-center'>
-          <input type="text" className='lg:w-[50%] w-[80%] h-[60%] bg-[#fffaf0] rounded-[30px] px-[50px] placeholder:text-[#6d766f] text-[#1f2a24] text-[18px]' placeholder='Search Here' onChange={(e) => setSearch(e.target.value)} value={search} />
+          {showSearch && (
+            <div className='absolute left-[12px] right-[12px] top-[calc(100%+10px)] flex h-[58px] items-center justify-center rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0f5] px-[14px] shadow-lg shadow-[#8f968f33] md:left-[10%] md:right-[10%]'>
+              <FiSearch className='mr-[10px] text-[21px] text-[#2f6f4e]' />
+              <input type="text" className='h-full w-full bg-transparent text-[16px] text-[#1f2a24] outline-none placeholder:text-[#6d766f]' placeholder='Search products' onChange={(e) => setSearch(e.target.value)} value={search} />
+            </div>
+          )}
+
+          {showProfile && (
+            <div className='absolute right-[22px] top-[calc(100%+10px)] w-[220px] rounded-xl border-[1px] border-[#b8c0ba] bg-[#fffaf0f5] p-[8px] shadow-lg shadow-[#8f968f33]'>
+              <button type='button' className='w-full rounded-lg px-[14px] py-[10px] text-left text-[15px] text-[#1f2a24] hover:bg-[#d8ded8]' onClick={handleLogout}>LogOut</button>
+            </div>
+          )}
         </div>
-      )}
+      </header>
 
-      {showProfile && (
-        <div className='absolute w-[220px] h-[62px] bg-[#fffaf0f2] top-[110%] right-[4%] border-[1px] border-[#b8c0ba] rounded-[10px] z-10'>
-          <ul className='w-[100%] h-[100%] flex items-start justify-around flex-col text-[17px] py-[10px] text-[#1f2a24]'>
-            {userData && <li className='w-[100%] hover:bg-[#d8ded8] px-[15px] py-[10px] cursor-pointer' onClick={() => { handleLogout(); setShowProfile(false) }}>LogOut</li>}
-          </ul>
-        </div>
-      )}
-
-      <div className='w-[100vw] h-[90px] flex items-center justify-between px-[20px] text-[12px] fixed bottom-0 left-0 bg-[#b7e4c7] md:hidden'>
-        <button className={mobileButtonClass("/")} onClick={() => navigate("/")}><IoMdHome className='w-[28px] h-[28px] text-[#1f2a24]' /> Home</button>
-        <button className={mobileButtonClass("/collection")} onClick={() => navigate("collection")}><HiOutlineCollection className='w-[28px] h-[28px] text-[#1f2a24]' /> Collections</button>
-        <button className={mobileButtonClass("/order")} onClick={() => navigate(userData ? "/order" : "/login")}><MdAssignment className='w-[28px] h-[28px] text-[#1f2a24]' /> Orders</button>
-        <button className={mobileButtonClass("/contact")} onClick={() => navigate("/contact")}><MdContacts className='w-[28px] h-[28px] text-[#1f2a24]' /> Contact</button>
-        <button className={mobileButtonClass("/cart")} onClick={() => navigate("/cart")}><MdOutlineShoppingCart className='w-[28px] h-[28px] text-[#1f2a24]' /> Cart</button>
-        <p className='absolute w-[18px] h-[18px] flex items-center justify-center bg-[#fffaf0] px-[5px] py-[2px] text-[#1f2a24] font-semibold rounded-full text-[9px] top-[8px] right-[18px]'>{getCartCount()}</p>
+      <div className='fixed bottom-0 left-0 right-0 z-30 flex h-[82px] items-center justify-between border-t-[1px] border-[#b8c0ba] bg-[#b7e4c7f2] px-[12px] shadow-[0_-8px_20px_#8f968f33] md:hidden'>
+        <button className={mobileButtonClass("/")} onClick={() => navigate("/")}><span className='flex flex-col items-center gap-[3px]'><IoMdHome className='text-[25px]' />Home</span></button>
+        <button className={mobileButtonClass("/collection")} onClick={() => navigate("/collection")}><span className='flex flex-col items-center gap-[3px]'><HiOutlineCollection className='text-[25px]' />Shop</span></button>
+        <button className={mobileButtonClass("/order")} onClick={() => navigate(userData ? "/order" : "/login")}><span className='flex flex-col items-center gap-[3px]'><MdAssignment className='text-[25px]' />Orders</span></button>
+        <button className={mobileButtonClass("/contact")} onClick={() => navigate("/contact")}><span className='flex flex-col items-center gap-[3px]'><MdContacts className='text-[25px]' />Contact</span></button>
+        <button className={mobileButtonClass("/cart")} onClick={() => navigate("/cart")}><span className='relative flex flex-col items-center gap-[3px]'><FiShoppingCart className='text-[25px]' />Cart<span className='absolute right-[-11px] top-[-8px] flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[#fffaf0] px-[3px] text-[9px] font-bold'>{getCartCount()}</span></span></button>
       </div>
-    </div>
+    </>
   )
 }
 

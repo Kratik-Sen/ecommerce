@@ -1,22 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react'
-import Title from '../component/Title'
+import { FiArrowRight, FiMinus, FiPlus, FiShield, FiShoppingBag, FiTrash2, FiTruck } from "react-icons/fi"
+import { MdOutlineAssignmentReturn } from "react-icons/md"
 import { shopDataContext } from '../context/ShopContext'
 import { useNavigate } from 'react-router-dom'
-import { RiDeleteBin6Line } from "react-icons/ri";
-import CartTotal from '../component/CartTotal';
-import { noSizeKey } from '../constants/categories';
-import { userDataContext } from '../context/UserContext';
-import { toast } from 'react-toastify';
+import { noSizeKey } from '../constants/categories'
+import { userDataContext } from '../context/UserContext'
+import { toast } from 'react-toastify'
 
 function Cart() {
-    const { products, currency, cartItem ,updateQuantity } = useContext(shopDataContext)
+  const { products, currency, cartItem, updateQuantity, getCartAmount, delivery_fee } = useContext(shopDataContext)
   const { userData } = useContext(userDataContext)
   const [cartData, setCartData] = useState([])
   const navigate = useNavigate()
 
-
   useEffect(() => {
-    const tempData = [];
+    const tempData = []
     for (const items in cartItem) {
       for (const item in cartItem[items]) {
         if (cartItem[items][item] > 0) {
@@ -24,70 +22,106 @@ function Cart() {
             _id: items,
             size: item,
             quantity: cartItem[items][item],
-          });
+          })
         }
       }
     }
-    setCartData(tempData); 
+    setCartData(tempData)
+  }, [cartItem])
 
-  }, [cartItem]);
-  return (
-    <div className='w-[99vw] min-h-[100vh] p-[20px] overflow-hidden bg-[linear-gradient(135deg,#f8f4e8_0%,#e9efe4_52%,#c7d1c8_100%)] '>
-      <div className='h-[8%] w-[100%] text-center mt-[80px]'>
-        <Title text1={'YOUR'} text2={'CART'} />
-      </div>
-
-      <div className='w-[100%] h-[92%] flex flex-wrap gap-[20px]'>
-        {
-         cartData.map((item,index)=>{
-             const productData = products.find((product) => product._id === item._id);
-             if (!productData) {
-              return null
-             }
-             const hasSize = item.size && item.size !== noSizeKey
-            
-             return (
-              <div key={index} className='w-[100%] h-[10%] border-t border-b  '>
-                <div className='w-[100%] h-[80%] flex items-start gap-6 bg-[#c9d0ca80]  py-[10px] px-[20px] rounded-2xl relative '>
-                    <img className='w-[100px] h-[100px] rounded-md ' src={productData.image1} alt="" />
-                    <div className='flex items-start justify-center flex-col gap-[10px]'>
-                    <p className='md:text-[25px] text-[20px] text-[#1f2a24]'>{productData.name}</p>
-                    <div className='flex items-center   gap-[20px]'>
-                      <p className='text-[20px] text-[#4f8f67]'>{currency} {productData.price}</p>
-                      {hasSize && <p className='min-w-[54px] h-[40px] px-[8px] text-[16px] text-[#1f2a24] 
-                      bg-[#c9d0cab4] rounded-md mt-[5px] flex items-center justify-center border-[1px] border-[#95d5b2]'>{item.size}</p>}
-                </div>
-                </div>
-                <input type="number" min={1} defaultValue={item.quantity} className=' md:max-w-20 max-w-10 md:px-2 md:py-2 py-[5px] px-[10px] text-[#1f2a24] text-[18px] font-semibold bg-[#c9d0cab4] absolute md:top-[40%] top-[46%] left-[75%] md:left-[50%] border-[1px] border-[#95d5b2] rounded-md '  onChange={(e)=> (e.target.value === ' ' || e.target.value === '0') ? null  :  updateQuantity(item._id,item.size,Number(e.target.value))} />
-
-                <RiDeleteBin6Line  className='text-[#4f8f67] w-[25px] h-[25px] absolute top-[50%] md:top-[40%] md:right-[5%] right-1' onClick={()=>updateQuantity(item._id,item.size,0)}/>
-                </div>
- 
-              </div>
-             )
-         })
-        }
-      </div>
-
-      <div className='flex justify-start items-end my-20'>
-        <div className='w-full sm:w-[450px]'>
-            <CartTotal/>
-            <button className='text-[18px] hover:bg-[#aeb7b1] cursor-pointer bg-[#c9d0ca80] py-[10px] px-[50px] rounded-2xl text-[#1f2a24] flex items-center justify-center gap-[20px]  border-[1px] border-[#b8c0ba] ml-[30px] mt-[20px]' onClick={()=>{
-                if (!userData) {
+  const checkout = () => {
+    if (!userData) {
       toast.error("Please login to place order")
-      navigate("/login", {state:{from:"/placeorder"}})
+      navigate("/login", { state: { from: "/placeorder" } })
     } else if (cartData.length > 0) {
-      navigate("/placeorder");
+      navigate("/placeorder")
     } else {
-      console.log("Your cart is empty!");
+      toast.error("Your cart is empty")
     }
-            }}>
-                PROCEED TO CHECKOUT
+  }
+
+  const features = [
+    { title: "Secure Checkout", text: "Your payments are safe and encrypted", icon: FiShield },
+    { title: "Fast Delivery", text: "Quick delivery at your doorstep", icon: FiTruck },
+    { title: "Easy Returns", text: "7 days easy return policy", icon: MdOutlineAssignmentReturn }
+  ]
+
+  return (
+    <main className='min-h-screen overflow-hidden bg-[linear-gradient(135deg,#f8f4e8_0%,#eef3ea_52%,#e1e7df_100%)] px-[18px] pb-[110px] pt-[108px] text-[#1f2a24] md:px-[34px]'>
+      <div className='pointer-events-none fixed inset-0 opacity-35 [background-image:radial-gradient(#95d5b2_1px,transparent_1px)] [background-size:34px_34px]'></div>
+      <div className='relative z-[1] mx-auto max-w-[1240px]'>
+        <div className='mb-[34px] text-center'>
+          <h1 className='text-[46px] leading-none text-[#0f4d45] md:text-[64px]'>Your Cart</h1>
+          <span className='mx-auto mt-[16px] block h-[2px] w-[58px] bg-[#95d5b2]'></span>
+        </div>
+
+        <div className='space-y-[22px]'>
+          {cartData.length === 0 && (
+            <div className='rounded-2xl border-[1px] border-[#e0d9c9] bg-[#fffaf0e8] p-[34px] text-center shadow-lg shadow-[#8f968f22]'>
+              <FiShoppingBag className='mx-auto text-[46px] text-[#2f6f4e]' />
+              <h2 className='mt-[14px] text-[24px] font-semibold'>Your cart is empty</h2>
+              <button type='button' className='mt-[18px] inline-flex items-center gap-[10px] rounded-xl bg-[#2f6f4e] px-[22px] py-[12px] font-bold text-[#fffaf0]' onClick={() => navigate("/collection")}>Start Shopping <FiArrowRight /></button>
+            </div>
+          )}
+
+          {cartData.map((item) => {
+            const productData = products.find((product) => product._id === item._id)
+            if (!productData) return null
+            const hasSize = item.size && item.size !== noSizeKey
+            return (
+              <article key={`${item._id}-${item.size}`} className='grid gap-[20px] rounded-2xl border-[1px] border-[#e0d9c9] bg-[#fffaf0d9] p-[18px] shadow-xl shadow-[#8f968f26] md:grid-cols-[180px_1fr_auto_auto] md:items-center md:p-[24px]'>
+                <img className='h-[180px] w-full rounded-xl border-[1px] border-[#e0d9c9] object-cover md:w-[180px]' src={productData.image1} alt={productData.name} />
+                <div>
+                  <h2 className='text-[26px] font-bold capitalize text-[#0f4d45]'>{productData.name}</h2>
+                  <p className='mt-[12px] text-[22px] font-bold text-[#2f6f4e]'>{currency} {productData.price}</p>
+                  {hasSize && <span className='mt-[14px] inline-flex rounded-lg bg-[#d8ded8] px-[16px] py-[9px] text-[14px] font-semibold text-[#1f2a24]'>Size: {item.size}</span>}
+                </div>
+
+                <div className='flex h-[52px] w-[170px] overflow-hidden rounded-xl border-[1px] border-[#d8ded8] bg-[#fffaf0]'>
+                  <button type='button' className='flex w-[52px] items-center justify-center text-[#2f6f4e]' onClick={() => updateQuantity(item._id, item.size, Math.max(0, item.quantity - 1))}><FiMinus /></button>
+                  <span className='flex flex-1 items-center justify-center border-x-[1px] border-[#d8ded8] font-bold'>{item.quantity}</span>
+                  <button type='button' className='flex w-[52px] items-center justify-center text-[#2f6f4e]' onClick={() => updateQuantity(item._id, item.size, item.quantity + 1)}><FiPlus /></button>
+                </div>
+
+                <div className='flex items-center justify-between gap-[24px] md:justify-end'>
+                  <p className='text-[18px] font-bold text-[#2f6f4e]'>{currency} {productData.price * item.quantity}</p>
+                  <button type='button' className='flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#eef3ea] text-[23px] text-[#0f4d45] transition hover:bg-[#d8ded8]' onClick={() => updateQuantity(item._id, item.size, 0)} aria-label='Remove item'>
+                    <FiTrash2 />
+                  </button>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+
+        <div className='mt-[34px] grid gap-[28px] lg:grid-cols-[420px_1fr] lg:items-center'>
+          <section className='rounded-2xl border-[1px] border-[#e0d9c9] bg-[#fffaf0e8] p-[24px] shadow-xl shadow-[#8f968f26]'>
+            <div className='mb-[22px] flex items-center gap-[14px]'>
+              <span className='flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#eef3ea] text-[27px] text-[#2f6f4e]'><FiShoppingBag /></span>
+              <h2 className='text-[25px] text-[#0f4d45]'>Cart Totals</h2>
+            </div>
+            <div className='space-y-[14px] text-[16px]'>
+              <div className='flex justify-between border-b-[1px] border-[#d8ded8] pb-[12px]'><span>Subtotal</span><span>{currency} {getCartAmount()}.00</span></div>
+              <div className='flex justify-between border-b-[1px] border-[#d8ded8] pb-[12px]'><span>Shipping Fee</span><span>{currency} {delivery_fee}.00</span></div>
+              <div className='flex justify-between text-[18px] font-bold'><span>Total</span><span className='text-[#2f6f4e]'>{currency} {getCartAmount() === 0 ? 0 : getCartAmount() + delivery_fee}.00</span></div>
+            </div>
+            <button type='button' className='mt-[24px] flex h-[58px] w-full items-center justify-center gap-[12px] rounded-xl bg-[#2f6f4e] px-[22px] font-bold text-[#fffaf0] shadow-lg shadow-[#8f968f33]' onClick={checkout}>
+              PROCEED TO CHECKOUT <FiArrowRight />
             </button>
+          </section>
+
+          <section className='grid gap-[20px] rounded-2xl border-[1px] border-[#e0d9c9] bg-[#fffaf0cc] p-[24px] shadow-xl shadow-[#8f968f22] md:grid-cols-3 md:p-[34px]'>
+            {features.map(({ title, text, icon: Icon }, index) => (
+              <div key={title} className={`text-center ${index > 0 ? "md:border-l-[1px] md:border-[#d8ded8]" : ""}`}>
+                <span className='mx-auto flex h-[64px] w-[64px] items-center justify-center rounded-full bg-[#e1f0e6] text-[31px] text-[#2f6f4e]'><Icon /></span>
+                <h3 className='mt-[18px] text-[18px] font-bold text-[#2f6f4e]'>{title}</h3>
+                <p className='mx-auto mt-[10px] max-w-[170px] text-[14px] leading-relaxed text-[#59645d]'>{text}</p>
+              </div>
+            ))}
+          </section>
         </div>
       </div>
-      
-    </div>
+    </main>
   )
 }
 

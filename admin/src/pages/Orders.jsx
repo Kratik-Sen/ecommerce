@@ -1,117 +1,169 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Nav from '../component/Nav'
 import Sidebar from '../component/Sidebar'
-import { useState } from 'react'
-import { useContext } from 'react'
 import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
-import { useEffect } from 'react'
-import { SiEbox } from "react-icons/si";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { FiChevronDown, FiChevronRight, FiFilter, FiPackage, FiSearch, FiTrash2 } from "react-icons/fi"
 
 const noSizeKey = "default"
 
 function Orders() {
+  const [orders, setOrders] = useState([])
+  const [search, setSearch] = useState("")
+  const { serverUrl } = useContext(authDataContext)
 
-  let [orders,setOrders] = useState([])
-  let {serverUrl} = useContext(authDataContext)
-
-    const fetchAllOrders =async () => {
+  const fetchAllOrders = async () => {
     try {
-      const result = await axios.post(serverUrl + '/api/order/list' , {} ,{withCredentials:true})
+      const result = await axios.post(serverUrl + '/api/order/list', {}, { withCredentials: true })
       setOrders(result.data.reverse())
-      
     } catch (error) {
       console.log(error)
     }
-    
   }
-   const statusHandler = async (e , orderId) => {
-         try {
-          const result = await axios.post(serverUrl + '/api/order/status' , {orderId,status:e.target.value},{withCredentials:true})
-          if(result.data){
-            await fetchAllOrders()
-          }
-         } catch (error) {
-          console.log(error)
-          
-         }
+
+  const statusHandler = async (e, orderId) => {
+    try {
+      const result = await axios.post(serverUrl + '/api/order/status', { orderId, status: e.target.value }, { withCredentials: true })
+      if (result.data) {
+        await fetchAllOrders()
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
-   const removeDeliveredOrder = async (orderId) => {
-         try {
-          const result = await axios.post(serverUrl + '/api/order/archive' , {orderId},{withCredentials:true})
-          if(result.data){
-            await fetchAllOrders()
-          }
-         } catch (error) {
-          console.log(error)
-         }
+
+  const removeDeliveredOrder = async (orderId) => {
+    try {
+      const result = await axios.post(serverUrl + '/api/order/archive', { orderId }, { withCredentials: true })
+      if (result.data) {
+        await fetchAllOrders()
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
-  useEffect(()=>{
+
+  useEffect(() => {
     fetchAllOrders()
-  },[])
+  }, [])
+
+  const filteredOrders = orders.filter(order => {
+    const query = search.toLowerCase()
+    const customer = `${order.address?.firstName || ""} ${order.address?.lastName || ""}`.toLowerCase()
+    const date = new Date(order.date).toLocaleString().toLowerCase()
+    return String(order._id).toLowerCase().includes(query) ||
+      customer.includes(query) ||
+      date.includes(query) ||
+      order.paymentMethod?.toLowerCase().includes(query)
+  })
+
   return (
-    <div className='w-[99vw] min-h-[100vh] bg-[linear-gradient(135deg,#f8f4e8_0%,#e9efe4_52%,#c7d1c8_100%)] text-[#1f2a24]'>
-      
-      <Nav/>
-      <div className='w-[100%] h-[100%] flex items-center lg:justify-start justify-center'>
-        <Sidebar/>
-        <div className='lg:w-[85%] md:w-[70%] h-[100%] lg:ml-[310px] md:ml-[250px] mt-[70px] flex flex-col gap-[30px] overflow-x-hidden py-[50px] ml-[100px]'>
-          <div className='w-[400px] h-[50px] text-[28px] md:text-[40px] mb-[20px] text-[#1f2a24]'>All Orders List</div>
-          {
-           orders.map((order)=>(
-            <div key={order._id} className='w-[90%] h-[40%] bg-[#c9d0ca] rounded-xl flex lg:items-center items-start justify-between  flex-col lg:flex-row p-[10px] md:px-[20px]  gap-[20px]'>
-            <SiEbox  className='w-[60px] h-[60px] text-[#1f2a24] p-[5px] rounded-lg bg-[#fffaf0]'/>
-
+    <div className='min-h-screen bg-[linear-gradient(135deg,#f8f4e8_0%,#eef3ea_52%,#e1e7df_100%)] text-[#1f2a24]'>
+      <Nav />
+      <Sidebar />
+      <main className='relative min-h-screen overflow-hidden pl-[86px] pt-[96px] md:pl-[258px] md:pt-[116px]'>
+        <div className='pointer-events-none fixed inset-0 opacity-25 [background-image:radial-gradient(#95d5b2_1px,transparent_1px)] [background-size:34px_34px]'></div>
+        <div className='relative z-[1] mx-auto max-w-[1320px] px-[18px] pb-[80px] md:px-[36px]'>
+          <div className='mb-[34px] grid gap-[18px] lg:grid-cols-[1fr_640px] lg:items-end'>
             <div>
-              <div className='flex items-start justify-center flex-col gap-[5px] text-[16px] text-[#2f6f4e]'>
-                {
-                  order.items.map((item,index)=>{
-                    const sizeText = item.size && item.size !== noSizeKey ? ` ${item.size}` : ""
-                    if(index === order.items.length - 1){
-                       return <p key={index}>{item.name.toUpperCase()}  *  {item.quantity}<span>{sizeText}</span></p>
-
-                    }else{
-                       return <p key={index}>{item.name.toUpperCase()}  *  {item.quantity}<span>{sizeText}</span>,</p>
-
-                    }
-                  })
-                }
+              <h1 className='text-[42px] font-bold leading-tight text-[#0f4d45] md:text-[52px]'>All Orders List</h1>
+              <span className='mt-[12px] block h-[2px] w-[58px] bg-[#2f6f4e]'></span>
+              <p className='mt-[16px] text-[17px] text-[#59645d]'>Track and manage all your orders in one place.</p>
+            </div>
+            <div className='flex flex-col gap-[14px] sm:flex-row'>
+              <div className='relative flex-1'>
+                <FiSearch className='absolute left-[18px] top-[15px] text-[22px] text-[#2f6f4e]' />
+                <input className='h-[54px] w-full rounded-xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] pl-[54px] pr-[18px] text-[15px] shadow-md shadow-[#8f968f1f] outline-none placeholder:text-[#6d766f] focus:border-[#74c69d]' placeholder='Search orders by ID, customer or date...' value={search} onChange={(e) => setSearch(e.target.value)} />
               </div>
-
-              <div className='text-[15px] text-[#4f8f67]'>
-                  <p>{order.address.firstName+" "+ order.address.lastName}</p>
-                  <p>{order.address.street + ", "}</p>
-                  <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.pinCode}</p>
-                  <p>{order.address.phone}</p>
-                </div>
+              <button type='button' className='inline-flex h-[54px] items-center justify-center gap-[12px] rounded-xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] px-[26px] font-bold text-[#2f6f4e] shadow-md shadow-[#8f968f1f]'>
+                <FiFilter /> Filter <FiChevronDown />
+              </button>
             </div>
-            <div className='text-[15px] text-[#4f8f67]'>
-                  <p>Items : {order.items.length}</p>
-                  <p>Method : {order.paymentMethod}</p>
-                  <p>Payment : {order.payment ? 'Done' : 'Pending'}</p>
-                  <p>Date : {new Date(order.date).toLocaleDateString()}</p>
-                   <p className='text-[20px] text-[#1f2a24]'> ₹ {order.amount}</p>
-                </div>
-                <select  value={order.status} className='px-[5px] py-[10px] bg-[#aeb7b1] rounded-lg border-[1px] border-[#95d5b2]' onChange={(e)=>statusHandler(e,order._id)} >
-                  <option value="Order Placed">Order Placed</option>
-                  <option value="Packing">Packing</option>
-                  <option value="Shipped">Shipped</option>
-                  <option value="Out for delivery">Out for delivery</option>
-                  <option value="Delivered">Delivered</option>
-                </select>
-                {order.status === "Delivered" && (
-                  <button className='flex items-center gap-[6px] px-[12px] py-[10px] bg-[#fffaf0] rounded-lg border-[1px] border-[#95d5b2] text-[#1f2a24]' onClick={()=>removeDeliveredOrder(order._id)}>
-                    <RiDeleteBin6Line /> Remove
-                  </button>
-                )}
-            </div>
-            
-           ))
+          </div>
 
-          }
+          <div className='space-y-[22px]'>
+            {filteredOrders.map((order) => {
+              const date = new Date(order.date).toLocaleString("en-US", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+              const customer = `${order.address?.firstName || ""} ${order.address?.lastName || ""}`.trim()
+              return (
+                <article key={order._id} className='grid gap-[22px] rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] p-[22px] shadow-xl shadow-[#8f968f22] lg:grid-cols-[96px_1fr_1fr_1fr_240px] lg:items-center'>
+                  <div className='flex h-[76px] w-[76px] items-center justify-center rounded-xl border-[1px] border-[#d8ded8] bg-[#fffaf0] text-[42px] text-[#0f4d45]'>
+                    <FiPackage />
+                  </div>
+
+                  <div className='space-y-[14px]'>
+                    <div>
+                      <p className='text-[15px] text-[#59645d]'>Order ID</p>
+                      <p className='break-all text-[19px] font-bold text-[#1f2a24]'>#ORD-{String(order._id).slice(-10).toUpperCase()}</p>
+                    </div>
+                    <div>
+                      <p className='text-[15px] text-[#59645d]'>Customer</p>
+                      <p className='text-[19px] font-bold text-[#2f6f4e]'>{customer || "Customer"}</p>
+                    </div>
+                    <div>
+                      <p className='text-[15px] text-[#59645d]'>Payment Method</p>
+                      <p className='text-[18px] font-bold text-[#2f6f4e]'>{order.paymentMethod}</p>
+                    </div>
+                  </div>
+
+                  <div className='space-y-[14px]'>
+                    <div>
+                      <p className='text-[15px] text-[#59645d]'>Date</p>
+                      <p className='text-[18px] font-bold text-[#1f2a24]'>{date}</p>
+                    </div>
+                    <div>
+                      <p className='text-[15px] text-[#59645d]'>Status</p>
+                      <select value={order.status} className='mt-[4px] rounded-full border-[1px] border-[#c9d0ca] bg-[#e1f0e6] px-[12px] py-[7px] text-[14px] font-bold text-[#2f6f4e] outline-none' onChange={(e) => statusHandler(e, order._id)}>
+                        <option value="Order Placed">Order Placed</option>
+                        <option value="Packing">Packing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Out for delivery">Out for delivery</option>
+                        <option value="Delivered">Delivered</option>
+                      </select>
+                    </div>
+                    <div>
+                      <p className='text-[15px] text-[#59645d]'>Total Amount</p>
+                      <p className='text-[19px] font-bold text-[#2f6f4e]'>₹ {order.amount}</p>
+                    </div>
+                  </div>
+
+                  <div className='space-y-[14px]'>
+                    <div>
+                      <p className='text-[15px] text-[#59645d]'>Items</p>
+                      <p className='text-[19px] font-bold text-[#1f2a24]'>{order.items.length} Items</p>
+                    </div>
+                    <div>
+                      <p className='text-[15px] text-[#59645d]'>Payment Status</p>
+                      <span className={`mt-[4px] inline-flex rounded-full px-[14px] py-[7px] text-[14px] font-bold ${order.payment ? "bg-[#e1f0e6] text-[#2f6f4e]" : "bg-[#fff3d9] text-[#9a6a16]"}`}>{order.payment ? "Paid" : "Pending"}</span>
+                    </div>
+                    <div className='text-[14px] text-[#59645d]'>
+                      {order.items.slice(0, 2).map((item, index) => {
+                        const sizeText = item.size && item.size !== noSizeKey ? ` (${item.size})` : ""
+                        return <p key={`${item._id}-${index}`}>{item.name} x {item.quantity}{sizeText}</p>
+                      })}
+                    </div>
+                  </div>
+
+                  <div className='flex flex-col gap-[12px] border-t-[1px] border-[#d8ded8] pt-[20px] lg:border-l-[1px] lg:border-t-0 lg:pl-[34px] lg:pt-0'>
+                    <button type='button' className='inline-flex h-[54px] items-center justify-center gap-[12px] rounded-xl border-[1px] border-[#2f6f4e] bg-[#fffaf0] px-[22px] font-bold text-[#2f6f4e]'>
+                      View Details <FiChevronRight />
+                    </button>
+                    {order.status === "Delivered" && (
+                      <button type='button' className='inline-flex h-[50px] items-center justify-center gap-[10px] rounded-xl border-[1px] border-[#f0bbb2] bg-[#fffaf0] px-[18px] font-bold text-[#d36b5f]' onClick={() => removeDeliveredOrder(order._id)}>
+                        <FiTrash2 /> Remove
+                      </button>
+                    )}
+                  </div>
+                </article>
+              )
+            })}
+
+            {filteredOrders.length === 0 && (
+              <div className='rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] p-[34px] text-center text-[#59645d] shadow-lg shadow-[#8f968f22]'>No orders found.</div>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

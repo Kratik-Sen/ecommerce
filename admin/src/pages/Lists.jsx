@@ -4,6 +4,8 @@ import Sidebar from '../component/Sidebar'
 import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { FiEdit2, FiFilter, FiSearch, FiX } from "react-icons/fi"
+import { MdDragIndicator } from "react-icons/md"
 
 function Lists() {
   const [list, setList] = useState([])
@@ -101,58 +103,67 @@ function Lists() {
   }, [])
 
   return (
-    <div className='w-[100vw] min-h-[100vh] bg-[linear-gradient(135deg,#f8f4e8_0%,#e9efe4_52%,#c7d1c8_100%)] text-[#1f2a24]'>
+    <div className='min-h-screen bg-[linear-gradient(135deg,#f8f4e8_0%,#eef3ea_52%,#e1e7df_100%)] text-[#1f2a24]'>
       <Nav />
-      <div className='w-[100%] h-[100%] flex items-center justify-start'>
-        <Sidebar />
-
-        <div className='w-[82%] h-[100%] lg:ml-[320px] md:ml-[230px] mt-[70px] flex flex-col gap-[30px] overflow-x-hidden py-[50px] ml-[100px]'>
-          <div className='w-[400px] h-[50px] text-[28px] md:text-[40px] mb-[20px] text-[#1f2a24]'>All Listed Products</div>
-
-          <input type="text" className='w-[90%] md:w-[520px] h-[45px] bg-[#fffaf0] border-[1px] border-[#b8c0ba] rounded-xl px-[18px] text-[16px] placeholder:text-[#6d766f]' placeholder='Search products, categories, sub-categories' value={search} onChange={(e) => setSearch(e.target.value)} />
+      <Sidebar />
+      <main className='relative min-h-screen overflow-hidden pl-[86px] pt-[96px] md:pl-[258px] md:pt-[116px]'>
+        <div className='pointer-events-none fixed inset-0 opacity-25 [background-image:radial-gradient(#95d5b2_1px,transparent_1px)] [background-size:34px_34px]'></div>
+        <div className='relative z-[1] mx-auto max-w-[1320px] px-[18px] pb-[80px] md:px-[36px]'>
+          <div className='mb-[26px] flex flex-col gap-[16px] lg:flex-row lg:items-center lg:justify-between'>
+            <div className='relative w-full max-w-[560px]'>
+              <FiSearch className='absolute left-[18px] top-[15px] text-[22px] text-[#59645d]' />
+              <input type="text" className='h-[54px] w-full rounded-xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] pl-[54px] pr-[18px] text-[15px] shadow-md shadow-[#8f968f1f] outline-none placeholder:text-[#6d766f] focus:border-[#74c69d]' placeholder='Search products, categories, sub-categories...' value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
+            <button type='button' className='inline-flex h-[54px] items-center justify-center gap-[12px] rounded-xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] px-[24px] font-bold text-[#2f6f4e] shadow-md shadow-[#8f968f1f]'>
+              <FiFilter /> Filter
+            </button>
+          </div>
 
           {editingProduct && (
-            <form onSubmit={updateProduct} className='w-[90%] bg-[#fffaf0cc] border-[1px] border-[#b8c0ba] rounded-xl p-[20px] flex flex-col gap-[12px]'>
-              <div className='text-[24px] text-[#1f2a24]'>Update Product</div>
-              <input name='name' value={editData.name} onChange={updateEditData} className='w-[100%] h-[42px] rounded-lg bg-[#c9d0ca] px-[14px]' placeholder='Product name' required />
-              <textarea name='description' value={editData.description} onChange={updateEditData} className='w-[100%] h-[95px] rounded-lg bg-[#c9d0ca] px-[14px] py-[10px]' placeholder='Product description' required />
-              <div className='w-[100%] flex flex-wrap gap-[12px]'>
-                <input name='price' type='number' value={editData.price} onChange={updateEditData} className='w-[180px] h-[42px] rounded-lg bg-[#c9d0ca] px-[14px]' placeholder='Price' required />
-                <input name='category' value={editData.category} onChange={updateEditData} className='w-[220px] h-[42px] rounded-lg bg-[#c9d0ca] px-[14px]' placeholder='Category' required />
-                <input name='subCategory' value={editData.subCategory} onChange={updateEditData} className='w-[220px] h-[42px] rounded-lg bg-[#c9d0ca] px-[14px]' placeholder='Sub-category' required />
-                <input name='sizes' value={editData.sizes} onChange={updateEditData} className='w-[260px] h-[42px] rounded-lg bg-[#c9d0ca] px-[14px]' placeholder='Sizes, e.g. S, M or 250g, 500g' />
+            <form onSubmit={updateProduct} className='mb-[22px] rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] p-[20px] shadow-xl shadow-[#8f968f22]'>
+              <div className='mb-[16px] text-[24px] font-bold text-[#0f4d45]'>Update Product</div>
+              <div className='grid gap-[12px] lg:grid-cols-2'>
+                <input name='name' value={editData.name} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Product name' required />
+                <input name='price' type='number' value={editData.price} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Price' required />
+                <textarea name='description' value={editData.description} onChange={updateEditData} className='min-h-[90px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] py-[10px] outline-none focus:border-[#74c69d] lg:col-span-2' placeholder='Product description' required />
+                <input name='category' value={editData.category} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Category' required />
+                <input name='subCategory' value={editData.subCategory} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Sub-category' required />
+                <input name='sizes' value={editData.sizes} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Sizes, e.g. S, M or 250g, 500g' />
+                <label className='flex h-[44px] items-center gap-[10px] text-[15px]'>
+                  <input type='checkbox' name='bestseller' checked={editData.bestseller} onChange={updateEditData} className='h-[18px] w-[18px]' />
+                  Bestseller
+                </label>
               </div>
-              <label className='flex items-center gap-[10px] text-[16px]'>
-                <input type='checkbox' name='bestseller' checked={editData.bestseller} onChange={updateEditData} className='w-[20px] h-[20px]' />
-                Bestseller
-              </label>
-              <div className='flex gap-[12px]'>
-                <button type='submit' className='px-[20px] py-[10px] bg-[#b7e4c7] rounded-lg border-[1px] border-[#74c69d]'>Save</button>
-                <button type='button' className='px-[20px] py-[10px] bg-[#d8ded8] rounded-lg border-[1px] border-[#b8c0ba]' onClick={() => setEditingProduct(null)}>Cancel</button>
+              <div className='mt-[16px] flex gap-[12px]'>
+                <button type='submit' className='rounded-lg bg-[#2f6f4e] px-[24px] py-[11px] font-bold text-[#fffaf0]'>Save</button>
+                <button type='button' className='rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[24px] py-[11px] font-bold text-[#2f6f4e]' onClick={() => setEditingProduct(null)}>Cancel</button>
               </div>
             </form>
           )}
 
-          {filteredList?.length > 0 ? (
-            filteredList.map((item) => (
-              <div className='w-[90%] md:h-[120px] h-[110px] bg-[#c9d0ca] rounded-xl flex items-center justify-start gap-[5px] md:gap-[30px] p-[10px] md:px-[30px]' key={item._id}>
-                <img src={item.image1} className='w-[30%] md:w-[120px] h-[90%] rounded-lg' alt="" />
-                <div className='w-[90%] h-[80%] flex flex-col items-start justify-center gap-[2px]'>
-                  <div className='w-[100%] md:text-[20px] text-[15px] text-[#2f6f4e]'>{item.name}</div>
-                  <div className='md:text-[17px] text-[15px] text-[#4f8f67]'>{item.category} / {item.subCategory}</div>
-                  <div className='md:text-[17px] text-[15px] text-[#4f8f67]'>₹{item.price}</div>
-                </div>
-                <div className='w-[18%] h-[100%] bg-transparent flex items-center justify-center gap-[8px]'>
-                  <button className='px-[12px] py-[8px] rounded-md bg-[#fffaf0] border-[1px] border-[#b8c0ba] cursor-pointer' onClick={() => openEdit(item)}>Edit</button>
-                  <span className='w-[35px] h-[30%] flex items-center justify-center rounded-md md:hover:bg-[#e3b9b4] md:hover:text-[#1f2a24] cursor-pointer' onClick={() => removeList(item._id)}>X</span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className='text-[#1f2a24] text-lg'>No matching products available.</div>
-          )}
+          <div className='space-y-[18px]'>
+            {filteredList?.length > 0 ? (
+              filteredList.map((item) => (
+                <article className='grid gap-[16px] rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] p-[14px] shadow-lg shadow-[#8f968f22] md:grid-cols-[28px_130px_1fr_auto] md:items-center md:p-[16px]' key={item._id}>
+                  <MdDragIndicator className='hidden text-[25px] text-[#c9d0ca] md:block' />
+                  <img src={item.image1} className='h-[130px] w-full rounded-xl object-cover md:w-[130px]' alt={item.name} />
+                  <div>
+                    <h2 className='text-[20px] font-bold capitalize text-[#0f4d45]'>{item.name}</h2>
+                    <p className='mt-[8px] text-[16px] text-[#4f8f67]'>{item.category} <span className='px-[10px] text-[#b8c0ba]'>/</span> {item.subCategory}</p>
+                    <p className='mt-[8px] text-[17px] font-bold text-[#2f6f4e]'>₹ {item.price}</p>
+                  </div>
+                  <div className='flex items-center gap-[18px] md:justify-end'>
+                    <button className='inline-flex h-[48px] items-center gap-[10px] rounded-lg border-[1px] border-[#2f6f4e] bg-[#fffaf0] px-[20px] font-bold text-[#2f6f4e]' onClick={() => openEdit(item)}>Edit <FiEdit2 /></button>
+                    <button className='flex h-[48px] w-[48px] items-center justify-center rounded-lg border-[1px] border-[#f0bbb2] bg-[#fffaf0] text-[24px] text-[#d36b5f]' onClick={() => removeList(item._id)} aria-label='Remove product'><FiX /></button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className='rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] p-[30px] text-center text-lg text-[#59645d]'>No matching products available.</div>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
