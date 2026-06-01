@@ -7,7 +7,7 @@ import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loading from '../component/Loading'
-import { defaultCategories, defaultSubCategories, isClothingCategory, isWeightCategory } from '../constants/categories'
+import { defaultCategories, isClothingCategory, isWeightCategory } from '../constants/categories'
 
 const getSavedOptions = (key, defaults) => {
   try {
@@ -27,28 +27,21 @@ function Add() {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [categoryOptions, setCategoryOptions] = useState(() => getSavedOptions("adminCategories", defaultCategories))
-  const [subCategoryOptions, setSubCategoryOptions] = useState(() => getSavedOptions("adminSubCategories", defaultSubCategories))
   const [category, setCategory] = useState(defaultCategories[0])
   const [price, setPrice] = useState("")
-  const [subCategory, setSubCategory] = useState(defaultSubCategories[0])
   const [customCategory, setCustomCategory] = useState("")
-  const [customSubCategory, setCustomSubCategory] = useState("")
   const [bestseller, setBestSeller] = useState(false)
   const [sizes,setSizes] = useState([])
   const [customWeight,setCustomWeight] = useState("")
   const [loading,setLoading] = useState(false)
   let {serverUrl} = useContext(authDataContext)
-  const hasClothingSizes = isClothingCategory(category) || isClothingCategory(subCategory)
-  const hasWeightSizes = isWeightCategory(category) || isWeightCategory(subCategory)
+  const hasClothingSizes = isClothingCategory(category)
+  const hasWeightSizes = isWeightCategory(category)
   const hasSizeOptions = hasClothingSizes || hasWeightSizes
 
   useEffect(() => {
     localStorage.setItem("adminCategories", JSON.stringify(categoryOptions.filter(item => !defaultCategories.includes(item))))
   }, [categoryOptions])
-
-  useEffect(() => {
-    localStorage.setItem("adminSubCategories", JSON.stringify(subCategoryOptions.filter(item => !defaultSubCategories.includes(item))))
-  }, [subCategoryOptions])
 
   useEffect(() => {
     if (!hasSizeOptions) {
@@ -81,8 +74,8 @@ function Add() {
     }
 
     const nextOptions = options.filter(item => item !== value)
-    const savedOptions = nextOptions.filter(item => !(label === "category" ? defaultCategories : defaultSubCategories).includes(item))
-    const removedOptions = (label === "category" ? defaultCategories : defaultSubCategories).filter(item => !nextOptions.includes(item))
+    const savedOptions = nextOptions.filter(item => !defaultCategories.includes(item))
+    const removedOptions = defaultCategories.filter(item => !nextOptions.includes(item))
 
     localStorage.setItem(storageKey, JSON.stringify(savedOptions))
     localStorage.setItem(`${storageKey}Removed`, JSON.stringify(removedOptions))
@@ -99,7 +92,7 @@ function Add() {
     setLoading(true)
     e.preventDefault()
     try {
-      if (!name.trim() || !description.trim() || !category.trim() || !subCategory.trim()) {
+      if (!name.trim() || !description.trim() || !category.trim()) {
         toast.error("Fill all product details")
         setLoading(false)
         return
@@ -128,7 +121,7 @@ function Add() {
       formData.append("description",description.trim())
       formData.append("price",price)
       formData.append("category",category)
-      formData.append("subCategory",subCategory)
+      formData.append("subCategory",category)
       formData.append("bestseller",bestseller)
       formData.append("sizes",JSON.stringify(hasSizeOptions ? sizes : []))
       formData.append("image1",image1)
@@ -154,7 +147,6 @@ function Add() {
       setSizes([])
       setCustomWeight("")
       setCategory(defaultCategories[0])
-      setSubCategory(defaultSubCategories[0])
       }
 
       
@@ -224,7 +216,7 @@ function Add() {
        </div>
 
        <div className='w-[80%]  flex items-center  gap-[10px] flex-wrap '>
-        <div className='md:w-[30%] w-[100%] flex items-start sm:justify-center flex-col  gap-[10px]'>
+        <div className='md:w-[50%] w-[100%] flex items-start sm:justify-center flex-col  gap-[10px]'>
           <p className='text-[20px] md:text-[25px]  font-semibold w-[100%]'>Product Category</p>
           <select name="" id="" value={category} className='bg-[#c9d0ca] w-[90%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px] ' onChange={(e)=>setCategory(e.target.value)}>
             {categoryOptions.map(item => (
@@ -235,21 +227,7 @@ function Add() {
             <input type="text" placeholder='Custom category' className='bg-[#c9d0ca] w-[100%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px]' value={customCategory} onChange={(e)=>setCustomCategory(e.target.value)} />
             <button type='button' className='px-[14px] py-[7px] rounded-lg bg-[#b7e4c7] border-[1px] border-[#74c69d]' onClick={()=>addCustomOption(customCategory, categoryOptions, setCategoryOptions, setCategory, setCustomCategory, "category")}>Add</button>
           </div>
-          <button type='button' className='w-[90%] px-[14px] py-[7px] rounded-lg bg-[#fffaf0] border-[1px] border-[#b8c0ba] text-left' onClick={()=>removeOption(category, categoryOptions, setCategoryOptions, category, setCategory, "adminCategories", "category")}>Remove Selected Category</button>
-        </div>
-        <div className='md:w-[30%] w-[100%] flex items-start sm:justify-center flex-col  gap-[10px]'>
-          <p className='text-[20px] md:text-[25px]  font-semibold w-[100%]'>Sub-Category</p>
-          <select name="" id="" value={subCategory} className='bg-[#c9d0ca] w-[90%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px] ' onChange={(e)=>setSubCategory(e.target.value)
-          }>
-            {subCategoryOptions.map(item => (
-              <option value={item} key={item}>{item}</option>
-            ))}
-          </select>
-          <div className='w-[90%] flex gap-[8px]'>
-            <input type="text" placeholder='Custom sub-category' className='bg-[#c9d0ca] w-[100%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px]' value={customSubCategory} onChange={(e)=>setCustomSubCategory(e.target.value)} />
-            <button type='button' className='px-[14px] py-[7px] rounded-lg bg-[#b7e4c7] border-[1px] border-[#74c69d]' onClick={()=>addCustomOption(customSubCategory, subCategoryOptions, setSubCategoryOptions, setSubCategory, setCustomSubCategory, "sub-category")}>Add</button>
-          </div>
-          <button type='button' className='w-[90%] px-[14px] py-[7px] rounded-lg bg-[#fffaf0] border-[1px] border-[#b8c0ba] text-left' onClick={()=>removeOption(subCategory, subCategoryOptions, setSubCategoryOptions, subCategory, setSubCategory, "adminSubCategories", "sub-category")}>Remove Selected Sub-Category</button>
+          <button type='button' className='w-[90%] px-[14px] py-[7px] rounded-lg bg-[#fffaf0] border-[1px] border-[#b8c0ba] text-left' onClick={()=>removeOption(category, categoryOptions, setCategoryOptions, category, setCategory, "adminCategories", "category")}>Remove {category} Category</button>
         </div>
        </div>
        <div className='w-[80%] h-[100px] flex items-start justify-center flex-col  gap-[10px]'>
