@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 import Title from '../component/Title';
 import { shopDataContext } from '../context/ShopContext';
 import Card from '../component/Card';
+import { defaultCategories, defaultSubCategories } from '../constants/categories';
 
 function Collections() {
 
@@ -13,6 +14,12 @@ function Collections() {
     let [category,setCaterory] = useState([])
     let [subCategory,setSubCaterory] = useState([])
     let [sortType,SetSortType] = useState("relavent")
+    const categoryOptions = useMemo(() => {
+        return [...new Set([...defaultCategories, ...products.map(item => item.category).filter(Boolean)])]
+    }, [products])
+    const subCategoryOptions = useMemo(() => {
+        return [...new Set([...defaultSubCategories, ...products.map(item => item.subCategory).filter(Boolean)])]
+    }, [products])
 
     const toggleCategory = (e) =>{
         if(category.includes(e.target.value)){
@@ -98,18 +105,18 @@ function Collections() {
 
         <div className={`border-[2px] border-[#b8c0ba] pl-5 py-3 mt-6 rounded-md bg-[#c9d0ca] ${showFilter ? "" : "hidden"} md:block`}>
             <p className='text-[18px] text-[#1f2a24]'>CATEGORIES</p>
-            <div className='w-[230px] h-[120px]  flex items-start justify-center gap-[10px] flex-col'>
-                <p className='flex items-center justify-center gap-[10px] text-[16px] font-light'> <input type="checkbox" value={'Men'} className='w-3' onChange={toggleCategory} /> Men</p>
-                 <p className='flex items-center justify-center gap-[10px] text-[16px] font-light'> <input type="checkbox" value={'Women'} className='w-3' onChange={toggleCategory} /> Women</p>
-                  <p className='flex items-center justify-center gap-[10px] text-[16px] font-light'> <input type="checkbox" value={'Kids'} onChange={toggleCategory} className='w-3' /> Kids</p>
+            <div className='w-[230px] max-h-[260px] overflow-y-auto flex items-start justify-start gap-[10px] flex-col pr-[8px]'>
+                {categoryOptions.map(item => (
+                    <p className='flex items-center justify-start gap-[10px] text-[16px] font-light' key={item}> <input type="checkbox" value={item} className='w-3' onChange={toggleCategory} /> {item}</p>
+                ))}
             </div>
         </div>
         <div className={`border-[2px] border-[#b8c0ba] pl-5 py-3 mt-6 rounded-md bg-[#c9d0ca] ${showFilter ? "" : "hidden"} md:block`}>
             <p className='text-[18px] text-[#1f2a24]'>SUB-CATEGORIES</p>
-            <div className='w-[230px] h-[120px]  flex items-start justify-center gap-[10px] flex-col'>
-                <p className='flex items-center justify-center gap-[10px] text-[16px] font-light'> <input type="checkbox" value={'TopWear'} className='w-3' onChange={toggleSubCategory} /> TopWear</p>
-                 <p className='flex items-center justify-center gap-[10px] text-[16px] font-light'> <input type="checkbox" value={'BottomWear'} className='w-3' onChange={toggleSubCategory} /> BottomWear</p>
-                  <p className='flex items-center justify-center gap-[10px] text-[16px] font-light'> <input type="checkbox" value={'WinterWear'} className='w-3' onChange={toggleSubCategory} /> WinterWear</p>
+            <div className='w-[230px] max-h-[260px] overflow-y-auto flex items-start justify-start gap-[10px] flex-col pr-[8px]'>
+                {subCategoryOptions.map(item => (
+                    <p className='flex items-center justify-start gap-[10px] text-[16px] font-light' key={item}> <input type="checkbox" value={item} className='w-3' onChange={toggleSubCategory} /> {item}</p>
+                ))}
             </div>
         </div>
       </div>

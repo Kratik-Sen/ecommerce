@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Nav from '../component/Nav'
 import Sidebar from '../component/Sidebar'
 import upload from '../assets/upload image.jpg'
@@ -7,6 +7,16 @@ import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loading from '../component/Loading'
+import { defaultCategories, defaultSubCategories } from '../constants/categories'
+
+const getSavedOptions = (key, defaults) => {
+  try {
+    const savedOptions = JSON.parse(localStorage.getItem(key)) || []
+    return [...new Set([...defaults, ...savedOptions])]
+  } catch {
+    return defaults
+  }
+}
 
 function Add() {
   let [image1,setImage1] = useState(false)
@@ -15,13 +25,43 @@ function Add() {
   let [image4,setImage4] = useState(false)
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  const [category, setCategory] = useState("Men")
+  const [categoryOptions, setCategoryOptions] = useState(() => getSavedOptions("adminCategories", defaultCategories))
+  const [subCategoryOptions, setSubCategoryOptions] = useState(() => getSavedOptions("adminSubCategories", defaultSubCategories))
+  const [category, setCategory] = useState(defaultCategories[0])
   const [price, setPrice] = useState("")
-  const [subCategory, setSubCategory] = useState("TopWear")
+  const [subCategory, setSubCategory] = useState(defaultSubCategories[0])
+  const [customCategory, setCustomCategory] = useState("")
+  const [customSubCategory, setCustomSubCategory] = useState("")
   const [bestseller, setBestSeller] = useState(false)
   const [sizes,setSizes] = useState([])
   const [loading,setLoading] = useState(false)
   let {serverUrl} = useContext(authDataContext)
+
+  useEffect(() => {
+    localStorage.setItem("adminCategories", JSON.stringify(categoryOptions.filter(item => !defaultCategories.includes(item))))
+  }, [categoryOptions])
+
+  useEffect(() => {
+    localStorage.setItem("adminSubCategories", JSON.stringify(subCategoryOptions.filter(item => !defaultSubCategories.includes(item))))
+  }, [subCategoryOptions])
+
+  const addCustomOption = (value, options, setOptions, setSelected, resetInput, label) => {
+    const trimmedValue = value.trim()
+    if (!trimmedValue) {
+      toast.error(`Enter ${label}`)
+      return
+    }
+
+    if (options.some(item => item.toLowerCase() === trimmedValue.toLowerCase())) {
+      toast.error(`${label} already exists`)
+      return
+    }
+
+    setOptions(prev => [...prev, trimmedValue])
+    setSelected(trimmedValue)
+    resetInput("")
+    toast.success(`${label} added`)
+  }
 
   const handleAddProduct = async (e) => {
     setLoading(true)
@@ -55,8 +95,8 @@ function Add() {
       setImage4(false)
       setPrice("")
       setBestSeller(false)
-      setCategory("Men")
-      setSubCategory("TopWear")
+      setCategory(defaultCategories[0])
+      setSubCategory(defaultSubCategories[0])
       }
 
       
@@ -128,20 +168,28 @@ function Add() {
        <div className='w-[80%]  flex items-center  gap-[10px] flex-wrap '>
         <div className='md:w-[30%] w-[100%] flex items-start sm:justify-center flex-col  gap-[10px]'>
           <p className='text-[20px] md:text-[25px]  font-semibold w-[100%]'>Product Category</p>
-          <select name="" id="" className='bg-[#c9d0ca] w-[60%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px] ' onChange={(e)=>setCategory(e.target.value)}>
-            <option value="Men">Men</option>
-            <option value="Women">Women</option>
-            <option value="Kids">Kids</option>
+          <select name="" id="" value={category} className='bg-[#c9d0ca] w-[90%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px] ' onChange={(e)=>setCategory(e.target.value)}>
+            {categoryOptions.map(item => (
+              <option value={item} key={item}>{item}</option>
+            ))}
           </select>
+          <div className='w-[90%] flex gap-[8px]'>
+            <input type="text" placeholder='Custom category' className='bg-[#c9d0ca] w-[100%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px]' value={customCategory} onChange={(e)=>setCustomCategory(e.target.value)} />
+            <button type='button' className='px-[14px] py-[7px] rounded-lg bg-[#b7e4c7] border-[1px] border-[#74c69d]' onClick={()=>addCustomOption(customCategory, categoryOptions, setCategoryOptions, setCategory, setCustomCategory, "category")}>Add</button>
+          </div>
         </div>
         <div className='md:w-[30%] w-[100%] flex items-start sm:justify-center flex-col  gap-[10px]'>
           <p className='text-[20px] md:text-[25px]  font-semibold w-[100%]'>Sub-Category</p>
-          <select name="" id="" className='bg-[#c9d0ca] w-[60%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px] ' onChange={(e)=>setSubCategory(e.target.value)
+          <select name="" id="" value={subCategory} className='bg-[#c9d0ca] w-[90%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px] ' onChange={(e)=>setSubCategory(e.target.value)
           }>
-            <option value="TopWear">TopWear</option>
-            <option value="BottomWear">BottomWear</option>
-            <option value="WinterWear">WinterWear</option>
+            {subCategoryOptions.map(item => (
+              <option value={item} key={item}>{item}</option>
+            ))}
           </select>
+          <div className='w-[90%] flex gap-[8px]'>
+            <input type="text" placeholder='Custom sub-category' className='bg-[#c9d0ca] w-[100%] px-[10px] py-[7px] rounded-lg hover:border-[#74c69d] border-[2px]' value={customSubCategory} onChange={(e)=>setCustomSubCategory(e.target.value)} />
+            <button type='button' className='px-[14px] py-[7px] rounded-lg bg-[#b7e4c7] border-[1px] border-[#74c69d]' onClick={()=>addCustomOption(customSubCategory, subCategoryOptions, setSubCategoryOptions, setSubCategory, setCustomSubCategory, "sub-category")}>Add</button>
+          </div>
         </div>
        </div>
        <div className='w-[80%] h-[100px] flex items-start justify-center flex-col  gap-[10px]'>

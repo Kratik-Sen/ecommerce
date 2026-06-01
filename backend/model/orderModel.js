@@ -35,6 +35,12 @@ const orderSchema = new mongoose.Schema({
     date: {
         type: Number,
         required:true
+    },
+    razorpayOrderId: {
+        type:String
+    },
+    razorpayPaymentId: {
+        type:String
     }
 },{timestamps:true}) 
 

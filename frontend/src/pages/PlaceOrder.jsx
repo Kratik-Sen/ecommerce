@@ -44,15 +44,31 @@ function PlaceOrder() {
       order_id: order.id,
       receipt: order.receipt,
       handler: async (response) => {
-        console.log(response)
-    const {data} = await axios.post(serverUrl + '/api/order/verifyrazorpay',response,{withCredentials:true})
-    if(data){
-        navigate("/order")
-        setCartItem({})
+        try {
+          console.log(response)
+          const {data} = await axios.post(serverUrl + '/api/order/verifyrazorpay',response,{withCredentials:true})
+          if(data?.message === 'Payment Successful'){
+              toast.success("Payment Successful")
+              navigate("/order")
+              setCartItem({})
 
+          }
+        } catch (error) {
+          console.log(error)
+          toast.error(error.response?.data?.message || "Payment verification failed")
+        }
+      },
+      modal: {
+        ondismiss: () => {
+          toast.error("Payment cancelled")
+        }
+      }
     }
-      }}
     const rzp = new window.Razorpay(options)
+    rzp.on('payment.failed', (response) => {
+      console.log(response.error)
+      toast.error("Payment Failed")
+    })
     rzp.open()
    }
 
@@ -103,7 +119,6 @@ function PlaceOrder() {
         const resultRazorpay = await axios.post(serverUrl + "/api/order/razorpay" , orderData , {withCredentials:true})
         if(resultRazorpay.data){
           initPay(resultRazorpay.data)
-           toast.success("Order Placed")
            setLoading(false)
         }
 
@@ -120,6 +135,8 @@ function PlaceOrder() {
       
     } catch (error) {
       console.log(error)
+      toast.error(error.response?.data?.message || "Order failed")
+      setLoading(false)
     
     }
      }
