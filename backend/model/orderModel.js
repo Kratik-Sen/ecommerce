@@ -41,6 +41,10 @@ const orderSchema = new mongoose.Schema({
     },
     razorpayPaymentId: {
         type:String
+    },
+    adminArchived: {
+        type:Boolean,
+        default:false
     }
 },{timestamps:true}) 
 

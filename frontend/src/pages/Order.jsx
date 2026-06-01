@@ -4,11 +4,13 @@ import { shopDataContext } from '../context/ShopContext'
 import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
 import { noSizeKey } from '../constants/categories'
+import { useNavigate } from 'react-router-dom'
 
 function Order() {
     let [orderData,setOrderData] = useState([])
     let {currency} = useContext(shopDataContext)
     let {serverUrl} = useContext(authDataContext)
+    let navigate = useNavigate()
 
     const loadOrderData = async () => {
        try {
@@ -70,6 +72,7 @@ useEffect(()=>{
                     </div>
                      <div className='absolute md:right-[5%] right-[1%] md:top-[40%] top-[70%]'> 
                     <button className='md:px-[15px] px-[5px] py-[3px] md:py-[7px] rounded-md bg-[#d8ded8] text-[#1f2a24] text-[12px] md:text-[16px] cursor-pointe active:bg-[#aeb7b1]' onClick={loadOrderData} >Track Order</button>
+                    {item.status === "Delivered" && <button className='md:px-[15px] px-[5px] py-[3px] md:py-[7px] rounded-md bg-[#b7e4c7] text-[#1f2a24] text-[12px] md:text-[16px] cursor-pointer active:bg-[#aeb7b1] ml-[8px]' onClick={()=>navigate(`/productdetail/${item._id}`)} >Rate</button>}
                   </div>
                     </div>
                 </div>

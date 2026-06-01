@@ -6,10 +6,11 @@ import Card from './Card'
 function LatestCollection() {
     let {products} = useContext(shopDataContext)
     let [latestProducts,setLatestProducts] = useState([])
+    let [visibleCount,setVisibleCount] = useState(8)
 
     useEffect(()=>{
-    setLatestProducts(products.slice(0,8));
-    },[products])
+    setLatestProducts(products.slice(0,visibleCount));
+    },[products,visibleCount])
 
   return (
     <div>
@@ -25,6 +26,13 @@ function LatestCollection() {
         }
         
         </div>
+        {visibleCount < products.length && (
+          <div className='w-[100%] flex items-center justify-center mt-[30px]'>
+            <button className='text-[16px] cursor-pointer bg-[#b7e4c7] py-[10px] px-[25px] rounded-2xl border-[1px] border-[#b8c0ba] text-[#1f2a24] shadow-md shadow-[#8f968f]' onClick={()=>setVisibleCount(prev => prev + 8)}>
+              Show More
+            </button>
+          </div>
+        )}
     </div>
   )
 }

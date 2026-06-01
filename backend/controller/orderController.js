@@ -154,7 +154,7 @@ export const userOrders = async (req,res) => {
     
 export const allOrders = async (req,res) => {
     try {
-        const orders = await Order.find({})
+        const orders = await Order.find({adminArchived:{$ne:true}})
         res.status(200).json(orders)
     } catch (error) {
         console.log(error)
@@ -175,4 +175,26 @@ try {
      return res.status(500).json({message:error.message
             })
 }
+}
+
+export const archiveDeliveredOrder = async (req,res) => {
+    try {
+        const {orderId} = req.body
+        const order = await Order.findById(orderId)
+
+        if (!order) {
+            return res.status(404).json({message:"Order not found"})
+        }
+
+        if (order.status !== "Delivered") {
+            return res.status(400).json({message:"Only delivered orders can be removed from admin history"})
+        }
+
+        order.adminArchived = true
+        await order.save()
+
+        return res.status(200).json({message:"Order removed from admin history"})
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
 }

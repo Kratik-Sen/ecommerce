@@ -1,5 +1,7 @@
 import uploadOnCloudinary from "../config/cloudinary.js"
 import Product from "../model/productModel.js"
+import Order from "../model/orderModel.js"
+import User from "../model/userModel.js"
 import { isClothingCategory } from "../constants/categories.js"
 
 
@@ -90,4 +92,52 @@ export const removeProduct = async (req,res) => {
     return res.status(500).json({message:`RemoveProduct error ${error}`})
     }
     
+}
+
+export const rateProduct = async (req,res) => {
+    try {
+        const {id} = req.params
+        const userId = req.userId
+        const numericRating = Number(req.body.rating)
+
+        if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
+            return res.status(400).json({message:"Rating must be between 1 and 5"})
+        }
+
+        const product = await Product.findById(id)
+        if (!product) {
+            return res.status(404).json({message:"Product not found"})
+        }
+
+        const deliveredOrders = await Order.find({userId, status:"Delivered"})
+        const hasDeliveredProduct = deliveredOrders.some(order =>
+            order.items.some(item => String(item._id) === id)
+        )
+
+        if (!hasDeliveredProduct) {
+            return res.status(403).json({message:"You can rate this product after it is delivered"})
+        }
+
+        const user = await User.findById(userId)
+        const existingRating = product.ratings.find(item => item.userId === userId)
+
+        if (existingRating) {
+            existingRating.rating = numericRating
+            existingRating.userName = user?.name || existingRating.userName
+            existingRating.createdAt = new Date()
+        } else {
+            product.ratings.push({
+                userId,
+                userName:user?.name || "User",
+                rating:numericRating
+            })
+        }
+
+        await product.save()
+
+        return res.status(200).json(product)
+    } catch (error) {
+        console.log("RateProduct error")
+        return res.status(500).json({message:`RateProduct error ${error}`})
+    }
 }

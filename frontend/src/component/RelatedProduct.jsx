@@ -12,10 +12,9 @@ function RelatedProduct({category,subCategory,currentProductId }) {
      if(products.length > 0){
 
         let productsCopy = products.slice()
-        productsCopy = productsCopy.filter((item) => category === item.category)
-        productsCopy = productsCopy.filter((item) => subCategory === item.subCategory)
         productsCopy = productsCopy.filter((item) => currentProductId  !== item._id)
-        setRelated(productsCopy.slice(0,4))
+        productsCopy = productsCopy.filter((item) => category === item.category || subCategory === item.subCategory)
+        setRelated(productsCopy.slice(0,8))
 
      }
     },[products,category,subCategory,currentProductId])
