@@ -159,6 +159,55 @@ export const userOrders = async (req,res) => {
     
 }
 
+export const cancelUserOrder = async (req,res) => {
+    try {
+        const userId = req.userId
+        const {orderId} = req.body
+        const order = await Order.findOne({_id:orderId, userId})
+
+        if (!order) {
+            return res.status(404).json({message:"Order not found"})
+        }
+
+        if (order.canceledByUser || order.status === "Cancelled") {
+            return res.status(400).json({message:"Order is already cancelled"})
+        }
+
+        if (order.status === "Delivered") {
+            return res.status(400).json({message:"Delivered orders cannot be cancelled"})
+        }
+
+        let refund = null
+        if (order.paymentMethod === "Razorpay" && order.payment && order.razorpayPaymentId) {
+            const {instance} = await getRazorpayConfig()
+            refund = await instance.payments.refund(order.razorpayPaymentId, {
+                amount: Math.round(Number(order.amount || 0) * 100),
+                notes: {
+                    orderId: String(order._id),
+                    reason: "Cancelled by user"
+                }
+            })
+        }
+
+        order.status = "Cancelled"
+        order.canceledByUser = true
+        order.canceledAt = Date.now()
+        if (refund) {
+            order.refundId = refund.id
+            order.refundStatus = refund.status
+        }
+        await order.save()
+
+        return res.status(200).json({
+            message: refund ? "Order cancelled and refund initiated" : "Order cancelled",
+            refund
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message:error.message})
+    }
+}
+
 
 
 
@@ -184,7 +233,17 @@ export const updateStatus = async (req,res) => {
 try {
     const {orderId , status} = req.body
 
-    await Order.findByIdAndUpdate(orderId , { status })
+    const order = await Order.findById(orderId)
+    if (!order) {
+        return res.status(404).json({message:"Order not found"})
+    }
+
+    if (order.canceledByUser || order.status === "Cancelled") {
+        return res.status(400).json({message:"Cancelled orders cannot be updated"})
+    }
+
+    order.status = status
+    await order.save()
     return res.status(201).json({message:'Status Updated'})
 } catch (error) {
      return res.status(500).json({message:error.message

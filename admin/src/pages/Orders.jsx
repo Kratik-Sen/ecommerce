@@ -25,6 +25,10 @@ function Orders() {
 
   const statusHandler = async (e, orderId) => {
     const nextStatus = e.target.value
+    const targetOrder = orders.find(order => order._id === orderId)
+    if (targetOrder?.canceledByUser || targetOrder?.status === "Cancelled") {
+      return
+    }
     const previousStatus = orders.find(order => order._id === orderId)?.status
     setOrders(prev => prev.map(order => order._id === orderId ? { ...order, status: nextStatus } : order))
     setUpdatingStatus(prev => ({ ...prev, [orderId]: true }))
@@ -66,6 +70,8 @@ function Orders() {
 
   const selectedAddress = selectedOrder?.address || {}
   const selectedCustomer = `${selectedAddress.firstName || ""} ${selectedAddress.lastName || ""}`.trim()
+  const refundLabel = (status) => String(status || "").toLowerCase() === "processed" ? "success" : status
+  const refundClass = (status) => String(status || "").toLowerCase() === "processed" ? "text-[#2f6f4e]" : "text-[#c84435]"
   const detailFields = [
     { label: "First Name", value: selectedAddress.firstName },
     { label: "Last Name", value: selectedAddress.lastName },
@@ -106,6 +112,7 @@ function Orders() {
             {filteredOrders.map((order) => {
               const date = new Date(order.date).toLocaleString("en-US", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
               const customer = `${order.address?.firstName || ""} ${order.address?.lastName || ""}`.trim()
+              const isCancelled = order.canceledByUser || order.status === "Cancelled"
               return (
                 <article key={order._id} className='grid gap-[22px] rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] p-[22px] shadow-xl shadow-[#8f968f22] lg:grid-cols-[96px_1fr_1fr_1fr_240px] lg:items-center'>
                   <div className='flex h-[76px] w-[76px] items-center justify-center rounded-xl border-[1px] border-[#d8ded8] bg-[#fffaf0] text-[42px] text-[#0f4d45]'>
@@ -134,12 +141,14 @@ function Orders() {
                     </div>
                     <div>
                       <p className='text-[15px] text-[#59645d]'>Status</p>
-                      <select value={order.status} disabled={!!updatingStatus[order._id]} className='mt-[4px] rounded-full border-[1px] border-[#c9d0ca] bg-[#e1f0e6] px-[12px] py-[7px] text-[14px] font-bold text-[#2f6f4e] outline-none disabled:opacity-70' onChange={(e) => statusHandler(e, order._id)}>
+                      {isCancelled && <p className='mt-[4px] rounded-full bg-[#ffe5e1] px-[14px] py-[7px] text-[14px] font-bold text-[#c84435]'>This product is canceled by user</p>}
+                      <select value={order.status} disabled={isCancelled || !!updatingStatus[order._id]} className={`mt-[8px] rounded-full border-[1px] px-[12px] py-[7px] text-[14px] font-bold outline-none disabled:cursor-not-allowed disabled:opacity-70 ${isCancelled ? "border-[#f0bbb2] bg-[#ffe5e1] text-[#c84435]" : "border-[#c9d0ca] bg-[#e1f0e6] text-[#2f6f4e]"}`} onChange={(e) => statusHandler(e, order._id)}>
                         <option value="Order Placed">Order Placed</option>
                         <option value="Packing">Packing</option>
                         <option value="Shipped">Shipped</option>
                         <option value="Out for delivery">Out for delivery</option>
                         <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
                       </select>
                     </div>
                     <div>
@@ -156,6 +165,7 @@ function Orders() {
                     <div>
                       <p className='text-[15px] text-[#59645d]'>Payment Status</p>
                       <span className={`mt-[4px] inline-flex rounded-full px-[14px] py-[7px] text-[14px] font-bold ${order.payment ? "bg-[#e1f0e6] text-[#2f6f4e]" : "bg-[#fff3d9] text-[#9a6a16]"}`}>{order.payment ? "Paid" : "Pending"}</span>
+                      {isCancelled && order.refundStatus && <p className={`mt-[8px] text-[14px] font-bold ${refundClass(order.refundStatus)}`}>Refund: {refundLabel(order.refundStatus)}</p>}
                     </div>
                     <div className='text-[14px] text-[#59645d]'>
                       {order.items.slice(0, 2).map((item, index) => {

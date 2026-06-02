@@ -42,6 +42,19 @@ const orderSchema = new mongoose.Schema({
     razorpayPaymentId: {
         type:String
     },
+    canceledByUser: {
+        type:Boolean,
+        default:false
+    },
+    canceledAt: {
+        type:Number
+    },
+    refundId: {
+        type:String
+    },
+    refundStatus: {
+        type:String
+    },
     adminArchived: {
         type:Boolean,
         default:false
