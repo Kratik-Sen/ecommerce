@@ -21,10 +21,10 @@ function BestSeller() {
             <Title text1={"BEST"} text2={"SELLER"}/> 
             <p className='w-[100%] m-auto text-[13px] md:text-[20px] px-[10px] text-[#59645d]'>Tried, Tested, Loved – Discover Our All-Time Best Sellers.</p>
         </div>
-        <div className='w-[100%] h-[50%] mt-[30px] flex items-center justify-center flex-wrap gap-[50px]'>
+        <div className='mt-[30px] grid w-full justify-items-center gap-[20px] sm:grid-cols-2 lg:grid-cols-4'>
             {
              bestSeller.map((item,index)=>(
-                <Card key={index} name={item.name} id={item._id} price={item.price} image={item.image1}/>
+                <Card key={index} name={item.name} id={item._id} price={item.price} image={item.image1} images={[item.image1, item.image2, item.image3, item.image4]}/>
              ))
             }
         </div>

@@ -14,6 +14,13 @@ function ShopContext({children}) {
     let [showSearch,setShowSearch] = useState(false)
     let {serverUrl} = useContext(authDataContext)
     let [cartItem, setCartItem] = useState({});
+    let [wishlist, setWishlist] = useState(() => {
+      try {
+        return JSON.parse(localStorage.getItem("wishlist")) || []
+      } catch {
+        return []
+      }
+    });
       let [loading,setLoading] = useState(false)
     let currency = '₹';
     let delivery_fee = 40;
@@ -83,6 +90,20 @@ function ShopContext({children}) {
       if (!product) return 0
       const variantPrice = product.variantPrices?.[size]
       return Number(variantPrice) > 0 ? Number(variantPrice) : Number(product.price || 0)
+    }
+
+    const isWishlisted = (itemId) => wishlist.includes(itemId)
+
+    const getWishlistCount = () => wishlist.length
+
+    const toggleWishlist = (itemId) => {
+      setWishlist(prev => {
+        const exists = prev.includes(itemId)
+        const next = exists ? prev.filter(id => id !== itemId) : [...prev, itemId]
+        localStorage.setItem("wishlist", JSON.stringify(next))
+        toast.success(exists ? "Removed from wishlist" : "Added to wishlist")
+        return next
+      })
     }
 
     const getUserCart = async () => {
@@ -190,7 +211,7 @@ function ShopContext({children}) {
 
 
     let value = {
-      products, currency , delivery_fee,getProducts,search,setSearch,showSearch,setShowSearch,cartItem, addtoCart, getCartCount, setCartItem ,updateQuantity,getCartAmount,getVariantPrice,loading
+      products, currency , delivery_fee,getProducts,search,setSearch,showSearch,setShowSearch,cartItem, addtoCart, getCartCount, setCartItem ,updateQuantity,getCartAmount,getVariantPrice,wishlist,isWishlisted,toggleWishlist,getWishlistCount,loading
     }
   return (
     <div>

@@ -18,6 +18,7 @@ import Cart from './pages/Cart'
 import PlaceOrder from './pages/PlaceOrder'
 import ProductDetail from './pages/ProductDetails'
 import RateProduct from './pages/RateProduct'
+import Wishlist from './pages/Wishlist'
 
 function App() {
 let {userData} = useContext(userDataContext)
@@ -64,6 +65,9 @@ let isAuthPage = location.pathname === "/login" || location.pathname === "/signu
 
 <Route path='/order' 
         element={userData ? <Order/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>
+
+<Route path='/wishlist' 
+        element={<Wishlist/>}/>
 
 <Route path='/rate/:productId' 
         element={userData ? <RateProduct/> : <Navigate to="/login" state={{from: location.pathname}} /> }/>

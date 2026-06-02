@@ -125,7 +125,7 @@ function Lists() {
           {editingProduct && (
             <>
             <div className='fixed inset-0 z-40 bg-[#1f2a2473] backdrop-blur-sm' onClick={() => setEditingProduct(null)}></div>
-            <form onSubmit={updateProduct} className='fixed left-1/2 top-1/2 z-50 max-h-[calc(100vh-32px)] w-[calc(100vw-32px)] max-w-[920px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0] p-[20px] shadow-2xl shadow-[#1f2a2455]'>
+            <form onSubmit={updateProduct} className='fixed left-[calc(50%+37px)] top-1/2 z-[80] max-h-[calc(100vh-28px)] w-[calc(100vw-96px)] max-w-[920px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0] p-[18px] shadow-2xl shadow-[#1f2a2455] md:left-[calc(50%+115px)] md:w-[calc(100vw-278px)] md:p-[20px]'>
               <div className='mb-[16px] flex items-center justify-between gap-[12px]'>
                 <div className='text-[24px] font-bold text-[#0f4d45]'>Update Product</div>
                 <button type='button' className='flex h-[42px] w-[42px] items-center justify-center rounded-full bg-[#eef3ea] text-[22px] text-[#2f6f4e]' onClick={() => setEditingProduct(null)} aria-label='Close update product'><FiX /></button>

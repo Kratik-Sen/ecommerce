@@ -96,9 +96,9 @@ function Home() {
           <button type='button' className='inline-flex items-center gap-[10px] text-[14px] font-semibold text-[#2f6f4e]' onClick={() => navigate("/collection")}>View All <FiArrowRight /></button>
         </div>
 
-        <div className='grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4'>
+        <div className='grid justify-items-center gap-[20px] sm:grid-cols-2 lg:grid-cols-4'>
           {popularProducts.map(item => (
-            <Card key={item._id} name={item.name} id={item._id} price={item.price} image={item.image1} />
+            <Card key={item._id} name={item.name} id={item._id} price={item.price} image={item.image1} images={[item.image1, item.image2, item.image3, item.image4]} />
           ))}
         </div>
       </section>

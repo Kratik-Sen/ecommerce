@@ -79,10 +79,10 @@ function Collections() {
   }, [products, category, search, showSearch, sortType, minPrice, maxPrice])
 
   return (
-    <main className='min-h-screen overflow-hidden bg-[linear-gradient(135deg,#f8f4e8_0%,#eef3ea_52%,#e1e7df_100%)] pt-[92px] text-[#1f2a24] md:pt-[104px]'>
+    <main className='min-h-screen w-full overflow-x-hidden bg-[linear-gradient(135deg,#f8f4e8_0%,#eef3ea_52%,#e1e7df_100%)] pt-[78px] text-[#1f2a24] sm:pt-[90px] md:pt-[104px]'>
       <div className='pointer-events-none fixed inset-0 opacity-40 [background-image:radial-gradient(#95d5b2_1px,transparent_1px)] [background-size:34px_34px]'></div>
-      <div className='relative z-[1] mx-auto grid max-w-[1500px] gap-[26px] px-[18px] pb-[110px] lg:grid-cols-[290px_1fr] lg:px-[34px]'>
-        <aside className='rounded-2xl border-[1px] border-[#e0d9c9] bg-[#fffaf0cc] p-[20px] shadow-lg shadow-[#8f968f22] backdrop-blur lg:sticky lg:top-[116px] lg:max-h-[calc(100vh-132px)] lg:overflow-y-auto'>
+      <div className='relative z-[1] mx-auto grid w-full max-w-[1500px] grid-cols-1 gap-[18px] px-[12px] pb-[110px] sm:px-[18px] lg:grid-cols-[290px_minmax(0,1fr)] lg:gap-[20px] lg:px-[34px]'>
+        <aside className='min-w-0 overflow-hidden rounded-xl border-[1px] border-[#e0d9c9] bg-[#fffaf0cc] p-[14px] shadow-lg shadow-[#8f968f22] backdrop-blur sm:rounded-2xl sm:p-[20px] lg:sticky lg:top-[116px] lg:max-h-[calc(100vh-132px)] lg:overflow-y-auto'>
           <button type='button' className='flex w-full items-center justify-between text-[20px] font-bold text-[#2f6f4e] lg:pointer-events-none' onClick={() => setShowFilter(prev => !prev)}>
             FILTERS <FiSliders />
           </button>
@@ -128,13 +128,13 @@ function Collections() {
         <section>
           <div className='mb-[24px] flex flex-col gap-[20px] lg:flex-row lg:items-end lg:justify-between'>
             <div>
-              <h1 className='text-[42px] leading-tight text-[#2f6f4e] md:text-[54px]'>All Collections</h1>
-              <p className='mt-[8px] text-[16px] text-[#59645d]'>Discover our wide range of premium fashion and lifestyle products.</p>
+              <h1 className='text-[38px] leading-tight text-[#2f6f4e] sm:text-[46px] md:text-[54px]'>All Collections</h1>
+              <p className='mt-[8px] max-w-[720px] text-[15px] leading-relaxed text-[#59645d] md:text-[16px]'>Discover our wide range of premium fashion and lifestyle products.</p>
             </div>
            
           </div>
 
-          <div className='mb-[26px] flex gap-[14px] overflow-x-auto pb-[4px]'>
+          <div className='mb-[26px] flex max-w-full gap-[12px] overflow-x-auto pb-[6px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             {quickFilters.map(item => {
               const value = item === "All Collections" ? item : item
               const active = item === "All Collections" ? category.length === 0 : category.includes(value)
@@ -146,9 +146,9 @@ function Collections() {
             })}
           </div>
 
-          <div className='grid gap-[22px] sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'>
+          <div className='grid justify-items-center gap-[20px] sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'>
             {filterProduct.map(item => (
-              <Card key={item._id} id={item._id} name={item.name} price={item.price} image={item.image1} />
+              <Card key={item._id} id={item._id} name={item.name} price={item.price} image={item.image1} images={[item.image1, item.image2, item.image3, item.image4]} />
             ))}
           </div>
         </section>
