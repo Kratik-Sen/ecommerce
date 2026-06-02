@@ -53,7 +53,7 @@ function Nav() {
     <>
       <header className='fixed left-0 right-0 top-0 z-30 px-[10px] pt-[8px] sm:px-[18px] md:px-[28px]'>
         <div className='mx-auto flex h-[58px] w-full max-w-[1360px] items-center justify-between rounded-[22px] border-[1px] border-[#e0d9c9] bg-[#fffaf0f4] px-[14px] shadow-lg shadow-[#8f968f33] backdrop-blur sm:h-[68px] sm:px-[22px] md:h-[82px] md:px-[34px]'>
-          <img src={logo} alt="HD Traders" className='h-[38px] w-auto cursor-pointer object-contain sm:h-[48px] md:h-[64px]' onClick={() => navigate("/")} />
+          <img src={logo} alt="HD Traders" className='h-[52px] max-h-[calc(100%+12px)] w-auto cursor-pointer object-contain sm:h-[64px] md:h-[82px]' onClick={() => navigate("/")} />
 
           <nav className='hidden items-center gap-[30px] lg:flex'>
             {navItems.map(item => (

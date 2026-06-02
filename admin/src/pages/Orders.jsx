@@ -3,7 +3,7 @@ import Nav from '../component/Nav'
 import Sidebar from '../component/Sidebar'
 import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
-import { FiChevronDown, FiChevronRight, FiFilter, FiPackage, FiSearch, FiTrash2 } from "react-icons/fi"
+import { FiChevronDown, FiChevronRight, FiFilter, FiMail, FiMapPin, FiPackage, FiPhone, FiSearch, FiTrash2, FiUser, FiX } from "react-icons/fi"
 
 const noSizeKey = "default"
 
@@ -11,6 +11,7 @@ function Orders() {
   const [orders, setOrders] = useState([])
   const [search, setSearch] = useState("")
   const [updatingStatus, setUpdatingStatus] = useState({})
+  const [selectedOrder, setSelectedOrder] = useState(null)
   const { serverUrl } = useContext(authDataContext)
 
   const fetchAllOrders = async () => {
@@ -62,6 +63,20 @@ function Orders() {
       date.includes(query) ||
       order.paymentMethod?.toLowerCase().includes(query)
   })
+
+  const selectedAddress = selectedOrder?.address || {}
+  const selectedCustomer = `${selectedAddress.firstName || ""} ${selectedAddress.lastName || ""}`.trim()
+  const detailFields = [
+    { label: "First Name", value: selectedAddress.firstName },
+    { label: "Last Name", value: selectedAddress.lastName },
+    { label: "Email", value: selectedAddress.email },
+    { label: "Phone", value: selectedAddress.phone },
+    { label: "Street", value: selectedAddress.street },
+    { label: "City", value: selectedAddress.city },
+    { label: "State", value: selectedAddress.state },
+    { label: "Pincode", value: selectedAddress.pinCode },
+    { label: "Country", value: selectedAddress.country },
+  ]
 
   return (
     <div className='min-h-screen bg-[linear-gradient(135deg,#f8f4e8_0%,#eef3ea_52%,#e1e7df_100%)] text-[#1f2a24]'>
@@ -151,7 +166,7 @@ function Orders() {
                   </div>
 
                   <div className='flex flex-col gap-[12px] border-t-[1px] border-[#d8ded8] pt-[20px] lg:border-l-[1px] lg:border-t-0 lg:pl-[34px] lg:pt-0'>
-                    <button type='button' className='inline-flex h-[54px] items-center justify-center gap-[12px] rounded-xl border-[1px] border-[#2f6f4e] bg-[#fffaf0] px-[22px] font-bold text-[#2f6f4e]'>
+                    <button type='button' className='inline-flex h-[54px] items-center justify-center gap-[12px] rounded-xl border-[1px] border-[#2f6f4e] bg-[#fffaf0] px-[22px] font-bold text-[#2f6f4e]' onClick={() => setSelectedOrder(order)}>
                       View Details <FiChevronRight />
                     </button>
                     {order.status === "Delivered" && (
@@ -170,6 +185,56 @@ function Orders() {
           </div>
         </div>
       </main>
+
+      {selectedOrder && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-[#1f2a2480] px-[14px] py-[22px] backdrop-blur-sm'>
+          <section className='max-h-[92vh] w-full max-w-[720px] overflow-y-auto rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0] p-[18px] shadow-2xl shadow-[#1f2a2440] md:p-[26px]'>
+            <div className='flex items-start justify-between gap-[16px] border-b-[1px] border-[#d8ded8] pb-[16px]'>
+              <div>
+                <p className='text-[14px] font-bold uppercase tracking-[0px] text-[#2f6f4e]'>Customer Details</p>
+                <h2 className='mt-[6px] text-[28px] font-bold leading-tight text-[#1f2a24]'>{selectedCustomer || "Customer"}</h2>
+                <p className='mt-[6px] break-all text-[14px] text-[#59645d]'>#ORD-{String(selectedOrder._id).slice(-10).toUpperCase()}</p>
+              </div>
+              <button type='button' className='flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full border-[1px] border-[#d8ded8] bg-[#fffaf0] text-[22px] text-[#2f6f4e]' aria-label='Close details' onClick={() => setSelectedOrder(null)}>
+                <FiX />
+              </button>
+            </div>
+
+            <div className='mt-[18px] grid gap-[12px] sm:grid-cols-3'>
+              <div className='rounded-xl border-[1px] border-[#d8ded8] bg-[#f8f4e8] p-[14px]'>
+                <FiUser className='mb-[10px] text-[22px] text-[#2f6f4e]' />
+                <p className='text-[13px] text-[#59645d]'>Name</p>
+                <p className='mt-[4px] text-[16px] font-bold text-[#1f2a24]'>{selectedCustomer || "Not provided"}</p>
+              </div>
+              <div className='rounded-xl border-[1px] border-[#d8ded8] bg-[#f8f4e8] p-[14px]'>
+                <FiMail className='mb-[10px] text-[22px] text-[#2f6f4e]' />
+                <p className='text-[13px] text-[#59645d]'>Email</p>
+                <p className='mt-[4px] break-all text-[16px] font-bold text-[#1f2a24]'>{selectedAddress.email || "Not provided"}</p>
+              </div>
+              <div className='rounded-xl border-[1px] border-[#d8ded8] bg-[#f8f4e8] p-[14px]'>
+                <FiPhone className='mb-[10px] text-[22px] text-[#2f6f4e]' />
+                <p className='text-[13px] text-[#59645d]'>Phone</p>
+                <p className='mt-[4px] text-[16px] font-bold text-[#1f2a24]'>{selectedAddress.phone || "Not provided"}</p>
+              </div>
+            </div>
+
+            <div className='mt-[18px] rounded-xl border-[1px] border-[#d8ded8] bg-[#f8f4e8] p-[16px]'>
+              <div className='mb-[12px] flex items-center gap-[10px] text-[#2f6f4e]'>
+                <FiMapPin className='text-[22px]' />
+                <h3 className='text-[18px] font-bold'>Delivery Form Information</h3>
+              </div>
+              <div className='grid gap-[10px] sm:grid-cols-2'>
+                {detailFields.map(field => (
+                  <div key={field.label} className='rounded-lg bg-[#fffaf0] p-[12px]'>
+                    <p className='text-[13px] text-[#59645d]'>{field.label}</p>
+                    <p className='mt-[4px] break-words text-[16px] font-semibold text-[#1f2a24]'>{field.value || "Not provided"}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   )
 }
