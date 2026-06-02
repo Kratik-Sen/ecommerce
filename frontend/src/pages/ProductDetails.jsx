@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { shopDataContext } from '../context/ShopContext'
-import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa"
+import { FaHeart, FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa"
 import { FiChevronDown, FiChevronUp, FiHeart, FiRefreshCw, FiShield, FiShoppingCart, FiTruck } from "react-icons/fi"
 import { MdOutlinePayment } from "react-icons/md"
 import { TbRosetteDiscountCheck } from "react-icons/tb"
@@ -16,7 +16,7 @@ import { isWeightCategory } from '../constants/categories'
 function ProductDetail() {
   const { productId } = useParams()
   const navigate = useNavigate()
-  const { products, currency, addtoCart, loading, getProducts, getVariantPrice } = useContext(shopDataContext)
+  const { products, currency, addtoCart, loading, getProducts, getVariantPrice, isWishlisted, toggleWishlist } = useContext(shopDataContext)
   const { serverUrl } = useContext(authDataContext)
   const { userData } = useContext(userDataContext)
   const [productData, setProductData] = useState(false)
@@ -33,6 +33,7 @@ function ProductDetail() {
   const selectedPrice = getVariantPrice(productData, size)
   const reviewCount = ratings.length
   const averageRating = reviewCount ? ratings.reduce((total, item) => total + Number(item.rating || 0), 0) / reviewCount : 0
+  const wished = productData?._id ? isWishlisted(productData._id) : false
   const productImages = useMemo(() => {
     if (!productData) return []
     return [productData.image1, productData.image2, productData.image3, productData.image4].filter(Boolean)
@@ -139,7 +140,9 @@ function ProductDetail() {
           </div>
 
           <div className='relative order-1 overflow-hidden rounded-2xl border-[1px] border-[#e0d9c9] bg-[#fffaf0] shadow-2xl shadow-[#8f968f3d] md:order-2'>
-            <button type='button' className='absolute right-[18px] top-[18px] z-[2] flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#fffaf0ef] text-[28px] text-[#1f2a24] shadow-lg shadow-[#8f968f33]'><FiHeart /></button>
+            <button type='button' className={`absolute right-[18px] top-[18px] z-[2] flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#fffaf0ef] text-[28px] shadow-lg shadow-[#8f968f33] transition hover:scale-105 ${wished ? "text-[#d36b5f]" : "text-[#2f6f4e]"}`} aria-label={wished ? "Remove from wishlist" : "Add to wishlist"} onClick={() => toggleWishlist(productData._id)}>
+              {wished ? <FaHeart /> : <FiHeart />}
+            </button>
             <img src={image} alt={productData.name} className='h-[420px] w-full object-cover md:h-[620px]' />
           </div>
         </div>
