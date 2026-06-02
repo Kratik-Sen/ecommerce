@@ -33,6 +33,8 @@ function Add() {
   const [bestseller, setBestSeller] = useState(false)
   const [sizes,setSizes] = useState([])
   const [customWeight,setCustomWeight] = useState("")
+  const [customWeightPrice,setCustomWeightPrice] = useState("")
+  const [variantPrices,setVariantPrices] = useState({})
   const [loading,setLoading] = useState(false)
   let {serverUrl} = useContext(authDataContext)
   const hasClothingSizes = isClothingCategory(category)
@@ -52,6 +54,7 @@ function Add() {
   useEffect(() => {
     if (!hasSizeOptions) {
       setSizes([])
+      setVariantPrices({})
     }
   }, [hasSizeOptions])
 
@@ -122,6 +125,12 @@ function Add() {
         return
       }
 
+      if (hasWeightSizes && sizes.some(item => !Number(variantPrices[item]) || Number(variantPrices[item]) <= 0)) {
+        toast.error("Add a valid price for each gram option")
+        setLoading(false)
+        return
+      }
+
       let formData = new FormData()
       formData.append("name",name.trim())
       formData.append("description",description.trim())
@@ -130,6 +139,7 @@ function Add() {
       formData.append("subCategory",category)
       formData.append("bestseller",bestseller)
       formData.append("sizes",JSON.stringify(hasSizeOptions ? sizes : []))
+      formData.append("variantPrices",JSON.stringify(hasWeightSizes ? variantPrices : {}))
       formData.append("image1",image1)
       formData.append("image2",image2)
       formData.append("image3",image3)
@@ -152,6 +162,8 @@ function Add() {
       setBestSeller(false)
       setSizes([])
       setCustomWeight("")
+      setCustomWeightPrice("")
+      setVariantPrices({})
       setCategory(categoryOptions[0] || "")
       }
 
@@ -265,21 +277,36 @@ function Add() {
        {hasWeightSizes && <div className='w-[80%] min-h-[150px] flex items-start justify-center flex-col gap-[10px] py-[10px]'>
         <p className='text-[20px] md:text-[25px] font-semibold'>Weight Options in Grams</p>
         <div className='w-[600px] max-w-[98%] flex gap-[10px] flex-wrap'>
-          <input type="number" min="1" placeholder='Enter grams' className='w-[220px] h-[40px] rounded-lg hover:border-[#74c69d] border-[2px] cursor-pointer bg-[#c9d0ca] px-[20px] text-[18px] placeholder:text-[#6d766f]' value={customWeight} onChange={(e)=>setCustomWeight(e.target.value)} />
+          <input type="number" min="1" placeholder='Enter grams' className='w-[180px] h-[40px] rounded-lg hover:border-[#74c69d] border-[2px] cursor-pointer bg-[#c9d0ca] px-[20px] text-[18px] placeholder:text-[#6d766f]' value={customWeight} onChange={(e)=>setCustomWeight(e.target.value)} />
+          <input type="number" min="1" placeholder='Price' className='w-[180px] h-[40px] rounded-lg hover:border-[#74c69d] border-[2px] cursor-pointer bg-[#c9d0ca] px-[20px] text-[18px] placeholder:text-[#6d766f]' value={customWeightPrice} onChange={(e)=>setCustomWeightPrice(e.target.value)} />
           <button type='button' className='px-[18px] py-[8px] rounded-lg bg-[#b7e4c7] border-[1px] border-[#74c69d]' onClick={()=>{
             const weight = Number(customWeight)
+            const weightPrice = Number(customWeightPrice)
             if (!weight || weight <= 0) {
               toast.error("Enter valid grams")
               return
             }
+            if (!weightPrice || weightPrice <= 0) {
+              toast.error("Enter valid price")
+              return
+            }
             const weightLabel = `${weight}g`
             setSizes(prev => prev.includes(weightLabel) ? prev : [...prev, weightLabel])
+            setVariantPrices(prev => ({ ...prev, [weightLabel]: weightPrice }))
             setCustomWeight("")
+            setCustomWeightPrice("")
           }}>Add Weight</button>
         </div>
         <div className='flex items-center justify-start gap-[15px] flex-wrap'>
           {sizes.map(item => (
-            <button type='button' key={item} className='px-[20px] py-[7px] rounded-lg bg-[#b7e4c7] text-[18px] border-[2px] border-[#74c69d] cursor-pointer' onClick={()=>setSizes(prev => prev.filter(size => size !== item))}>{item} ×</button>
+            <button type='button' key={item} className='px-[20px] py-[7px] rounded-lg bg-[#b7e4c7] text-[18px] border-[2px] border-[#74c69d] cursor-pointer' onClick={()=>{
+              setSizes(prev => prev.filter(size => size !== item))
+              setVariantPrices(prev => {
+                const next = { ...prev }
+                delete next[item]
+                return next
+              })
+            }}>{item} - {variantPrices[item]} x</button>
           ))}
         </div>
        </div>}

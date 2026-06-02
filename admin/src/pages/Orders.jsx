@@ -10,6 +10,7 @@ const noSizeKey = "default"
 function Orders() {
   const [orders, setOrders] = useState([])
   const [search, setSearch] = useState("")
+  const [updatingStatus, setUpdatingStatus] = useState({})
   const { serverUrl } = useContext(authDataContext)
 
   const fetchAllOrders = async () => {
@@ -22,13 +23,18 @@ function Orders() {
   }
 
   const statusHandler = async (e, orderId) => {
+    const nextStatus = e.target.value
+    const previousStatus = orders.find(order => order._id === orderId)?.status
+    setOrders(prev => prev.map(order => order._id === orderId ? { ...order, status: nextStatus } : order))
+    setUpdatingStatus(prev => ({ ...prev, [orderId]: true }))
+
     try {
-      const result = await axios.post(serverUrl + '/api/order/status', { orderId, status: e.target.value }, { withCredentials: true })
-      if (result.data) {
-        await fetchAllOrders()
-      }
+      await axios.post(serverUrl + '/api/order/status', { orderId, status: nextStatus }, { withCredentials: true })
     } catch (error) {
       console.log(error)
+      setOrders(prev => prev.map(order => order._id === orderId ? { ...order, status: previousStatus } : order))
+    } finally {
+      setUpdatingStatus(prev => ({ ...prev, [orderId]: false }))
     }
   }
 
@@ -113,7 +119,7 @@ function Orders() {
                     </div>
                     <div>
                       <p className='text-[15px] text-[#59645d]'>Status</p>
-                      <select value={order.status} className='mt-[4px] rounded-full border-[1px] border-[#c9d0ca] bg-[#e1f0e6] px-[12px] py-[7px] text-[14px] font-bold text-[#2f6f4e] outline-none' onChange={(e) => statusHandler(e, order._id)}>
+                      <select value={order.status} disabled={!!updatingStatus[order._id]} className='mt-[4px] rounded-full border-[1px] border-[#c9d0ca] bg-[#e1f0e6] px-[12px] py-[7px] text-[14px] font-bold text-[#2f6f4e] outline-none disabled:opacity-70' onChange={(e) => statusHandler(e, order._id)}>
                         <option value="Order Placed">Order Placed</option>
                         <option value="Packing">Packing</option>
                         <option value="Shipped">Shipped</option>

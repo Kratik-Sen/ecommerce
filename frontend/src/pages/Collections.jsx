@@ -82,7 +82,7 @@ function Collections() {
     <main className='min-h-screen overflow-hidden bg-[linear-gradient(135deg,#f8f4e8_0%,#eef3ea_52%,#e1e7df_100%)] pt-[92px] text-[#1f2a24] md:pt-[104px]'>
       <div className='pointer-events-none fixed inset-0 opacity-40 [background-image:radial-gradient(#95d5b2_1px,transparent_1px)] [background-size:34px_34px]'></div>
       <div className='relative z-[1] mx-auto grid max-w-[1500px] gap-[26px] px-[18px] pb-[110px] lg:grid-cols-[290px_1fr] lg:px-[34px]'>
-        <aside className='rounded-2xl border-[1px] border-[#e0d9c9] bg-[#fffaf0cc] p-[20px] shadow-lg shadow-[#8f968f22] backdrop-blur lg:sticky lg:top-[116px] lg:min-h-[calc(100vh-140px)]'>
+        <aside className='rounded-2xl border-[1px] border-[#e0d9c9] bg-[#fffaf0cc] p-[20px] shadow-lg shadow-[#8f968f22] backdrop-blur lg:sticky lg:top-[116px] lg:max-h-[calc(100vh-132px)] lg:overflow-y-auto'>
           <button type='button' className='flex w-full items-center justify-between text-[20px] font-bold text-[#2f6f4e] lg:pointer-events-none' onClick={() => setShowFilter(prev => !prev)}>
             FILTERS <FiSliders />
           </button>

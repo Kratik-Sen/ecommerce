@@ -8,7 +8,7 @@ import { userDataContext } from '../context/UserContext'
 import { toast } from 'react-toastify'
 
 function Cart() {
-  const { products, currency, cartItem, updateQuantity, getCartAmount, delivery_fee } = useContext(shopDataContext)
+  const { products, currency, cartItem, updateQuantity, getCartAmount, delivery_fee, getVariantPrice } = useContext(shopDataContext)
   const { userData } = useContext(userDataContext)
   const [cartData, setCartData] = useState([])
   const navigate = useNavigate()
@@ -68,12 +68,13 @@ function Cart() {
             const productData = products.find((product) => product._id === item._id)
             if (!productData) return null
             const hasSize = item.size && item.size !== noSizeKey
+            const itemPrice = getVariantPrice(productData, item.size)
             return (
               <article key={`${item._id}-${item.size}`} className='grid gap-[20px] rounded-2xl border-[1px] border-[#e0d9c9] bg-[#fffaf0d9] p-[18px] shadow-xl shadow-[#8f968f26] md:grid-cols-[180px_1fr_auto_auto] md:items-center md:p-[24px]'>
                 <img className='h-[180px] w-full rounded-xl border-[1px] border-[#e0d9c9] object-cover md:w-[180px]' src={productData.image1} alt={productData.name} />
                 <div>
                   <h2 className='text-[26px] font-bold capitalize text-[#0f4d45]'>{productData.name}</h2>
-                  <p className='mt-[12px] text-[22px] font-bold text-[#2f6f4e]'>{currency} {productData.price}</p>
+                  <p className='mt-[12px] text-[22px] font-bold text-[#2f6f4e]'>{currency} {itemPrice}</p>
                   {hasSize && <span className='mt-[14px] inline-flex rounded-lg bg-[#d8ded8] px-[16px] py-[9px] text-[14px] font-semibold text-[#1f2a24]'>Size: {item.size}</span>}
                 </div>
 
@@ -84,7 +85,7 @@ function Cart() {
                 </div>
 
                 <div className='flex items-center justify-between gap-[24px] md:justify-end'>
-                  <p className='text-[18px] font-bold text-[#2f6f4e]'>{currency} {productData.price * item.quantity}</p>
+                  <p className='text-[18px] font-bold text-[#2f6f4e]'>{currency} {itemPrice * item.quantity}</p>
                   <button type='button' className='flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#eef3ea] text-[23px] text-[#0f4d45] transition hover:bg-[#d8ded8]' onClick={() => updateQuantity(item._id, item.size, 0)} aria-label='Remove item'>
                     <FiTrash2 />
                   </button>

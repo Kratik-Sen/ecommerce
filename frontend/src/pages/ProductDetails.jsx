@@ -16,7 +16,7 @@ import { isWeightCategory } from '../constants/categories'
 function ProductDetail() {
   const { productId } = useParams()
   const navigate = useNavigate()
-  const { products, currency, addtoCart, loading, getProducts } = useContext(shopDataContext)
+  const { products, currency, addtoCart, loading, getProducts, getVariantPrice } = useContext(shopDataContext)
   const { serverUrl } = useContext(authDataContext)
   const { userData } = useContext(userDataContext)
   const [productData, setProductData] = useState(false)
@@ -30,6 +30,7 @@ function ProductDetail() {
   const hasSizeOptions = sizeOptions.length > 0
   const hasWeightOptions = isWeightCategory(productData?.category) || isWeightCategory(productData?.subCategory)
   const ratings = Array.isArray(productData?.ratings) ? productData.ratings : []
+  const selectedPrice = getVariantPrice(productData, size)
   const reviewCount = ratings.length
   const averageRating = reviewCount ? ratings.reduce((total, item) => total + Number(item.rating || 0), 0) / reviewCount : 0
   const productImages = useMemo(() => {
@@ -150,7 +151,7 @@ function ProductDetail() {
             <div className='flex items-center gap-[4px]'>{renderAverageStars()}</div>
             <span className='text-[15px] text-[#1f2a24]'>({reviewCount})</span>
           </div>
-          <p className='mt-[14px] text-[34px] font-bold text-[#0f4d45]'>{currency} {productData.price}</p>
+          <p className='mt-[14px] text-[34px] font-bold text-[#0f4d45]'>{currency} {selectedPrice}</p>
           <p className='mt-[12px] max-w-[520px] text-[17px] leading-relaxed text-[#59645d]'>{productData.description}</p>
 
           <div className='my-[24px] h-[1px] bg-[#d8ded8]'></div>
@@ -161,7 +162,7 @@ function ProductDetail() {
               <div className='mt-[14px] flex flex-wrap gap-[14px]'>
                 {sizeOptions.map((item) => (
                   <button key={item} type='button' className={`min-w-[62px] rounded-lg border-[1px] px-[18px] py-[12px] text-[14px] font-semibold transition ${item === size ? "border-[#2f6f4e] bg-[#2f6f4e] text-[#fffaf0] shadow-md shadow-[#8f968f33]" : "border-[#d8ded8] bg-[#fffaf0] text-[#1f2a24]"}`} onClick={() => setSize(item)}>
-                    {item}
+                    {item}{productData.variantPrices?.[item] ? ` - ${currency} ${productData.variantPrices[item]}` : ""}
                   </button>
                 ))}
               </div>

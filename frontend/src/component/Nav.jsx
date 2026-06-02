@@ -53,7 +53,7 @@ function Nav() {
           <nav className='hidden items-center gap-[30px] lg:flex'>
             {navItems.map(item => (
               <button key={item.path} type='button' onClick={() => goTo(item)} className={`relative text-[14px] font-medium tracking-[0px] text-[#1f2a24] transition hover:text-[#2f6f4e] ${isActive(item.path) ? "text-[#2f6f4e]" : ""}`}>
-                <span className='inline-flex items-center gap-[4px]'>{item.label}{item.label === "COLLECTIONS" && <FiChevronDown className='text-[13px]' />}</span>
+                <span className='inline-flex items-center gap-[4px]'>{item.label}</span>
                 {isActive(item.path) && <span className='absolute left-0 right-0 top-[28px] mx-auto h-[2px] w-full rounded-full bg-[#2f6f4e]'></span>}
               </button>
             ))}

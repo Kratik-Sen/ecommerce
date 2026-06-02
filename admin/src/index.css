@@ -11,6 +11,32 @@ body {
   color: #1f2a24;
 }
 
+main {
+  position: relative;
+  isolation: isolate;
+}
+
+main::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  background-image:
+    radial-gradient(ellipse at 50% 14%, rgba(116, 198, 157, 0.45) 0 5px, transparent 6px),
+    radial-gradient(ellipse at 50% 86%, rgba(116, 198, 157, 0.45) 0 5px, transparent 6px),
+    radial-gradient(ellipse at 14% 50%, rgba(149, 213, 178, 0.45) 0 5px, transparent 6px),
+    radial-gradient(ellipse at 86% 50%, rgba(149, 213, 178, 0.45) 0 5px, transparent 6px),
+    radial-gradient(circle at 50% 50%, rgba(47, 111, 78, 0.34) 0 2px, transparent 3px);
+  background-size: 96px 96px;
+}
+
+main > * {
+  position: relative;
+  z-index: 1;
+}
+
 button,
 input,
 textarea,

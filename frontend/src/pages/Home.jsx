@@ -9,6 +9,8 @@ import back3 from "../assets/back3.jpg"
 import { shopDataContext } from '../context/ShopContext'
 import Card from '../component/Card'
 import Footer from '../component/Footer'
+import LatestCollection from '../component/LatestCollection'
+import BestSeller from '../component/BestSeller'
 
 function Home() {
   const { products } = useContext(shopDataContext)
@@ -75,6 +77,14 @@ function Home() {
             </button>
           ))}
         </div>
+      </section>
+
+      <section className='mx-auto max-w-[1220px] px-[20px] py-[34px] md:py-[48px]'>
+        <LatestCollection />
+      </section>
+
+      <section className='mx-auto max-w-[1220px] px-[20px] py-[20px] md:py-[34px]'>
+        <BestSeller />
       </section>
 
       <section className='mx-auto max-w-[1220px] px-[20px] py-[42px] md:py-[58px]'>

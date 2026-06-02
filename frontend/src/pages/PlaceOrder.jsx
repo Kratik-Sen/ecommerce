@@ -12,7 +12,7 @@ import Loading from '../component/Loading'
 function PlaceOrder() {
   const [method, setMethod] = useState('cod')
   const navigate = useNavigate()
-  const { cartItem, setCartItem, getCartAmount, delivery_fee, products } = useContext(shopDataContext)
+  const { cartItem, setCartItem, getCartAmount, delivery_fee, products, getVariantPrice } = useContext(shopDataContext)
   const { serverUrl } = useContext(authDataContext)
   const [loading, setLoading] = useState(false)
   const [razorpayKeyId, setRazorpayKeyId] = useState("")
@@ -110,6 +110,7 @@ function PlaceOrder() {
             if (itemInfo) {
               itemInfo.size = item
               itemInfo.quantity = cartItem[items][item]
+              itemInfo.price = getVariantPrice(itemInfo, item)
               orderItems.push(itemInfo)
             }
           }

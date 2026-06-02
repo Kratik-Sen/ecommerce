@@ -17,14 +17,12 @@ import Product from './pages/Product'
 import Cart from './pages/Cart'
 import PlaceOrder from './pages/PlaceOrder'
 import ProductDetail from './pages/ProductDetails'
-import Ai from './component/Ai'
 import RateProduct from './pages/RateProduct'
 
 function App() {
 let {userData} = useContext(userDataContext)
 let location = useLocation()
 let isAuthPage = location.pathname === "/login" || location.pathname === "/signup"
-let hideAi = isAuthPage || location.pathname === "/placeorder"
   return (
    <>
     <ToastContainer/>
@@ -73,7 +71,6 @@ let hideAi = isAuthPage || location.pathname === "/placeorder"
         <Route path='*' element={<NotFound/>}/>
 
    </Routes>
-    {!hideAi && <Ai />}
    </>
   )
 }

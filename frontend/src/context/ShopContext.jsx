@@ -35,7 +35,7 @@ function ShopContext({children}) {
       const selectedSize = hasSizeOptions ? size : noSizeKey
 
        if (hasSizeOptions && !size) {
-      toast.error("Select Product Size");
+      toast.error("Select Product Option");
       return;
     }
 
@@ -79,17 +79,21 @@ function ShopContext({children}) {
     }
 
 
+    const getVariantPrice = (product, size) => {
+      if (!product) return 0
+      const variantPrice = product.variantPrices?.[size]
+      return Number(variantPrice) > 0 ? Number(variantPrice) : Number(product.price || 0)
+    }
+
     const getUserCart = async () => {
       try {
         const result = await axios.post(serverUrl + '/api/cart/get',{},{ withCredentials: true })
-
-      setCartItem(result.data)
-    } catch (error) {
-      console.log(error)
-     
-
-      
+        setCartItem(result.data)
+      } catch (error) {
+        console.log(error)
+      }
     }
+
     const syncCartAfterLogin = async () => {
       try {
         const result = await axios.post(serverUrl + '/api/cart/get',{},{ withCredentials: true })
@@ -116,8 +120,6 @@ function ShopContext({children}) {
       } catch (error) {
         console.log(error)
       }
-    }
-      
     }
     const updateQuantity = async (itemId , size , quantity) => {
       let cartData = structuredClone(cartItem);
@@ -157,7 +159,7 @@ function ShopContext({children}) {
       for (const item in cartItem[items]) {
         try {
           if (cartItem[items][item] > 0) {
-            totalAmount += itemInfo.price * cartItem[items][item];
+            totalAmount += getVariantPrice(itemInfo, item) * cartItem[items][item];
           }
         } catch (error) {
 
@@ -188,7 +190,7 @@ function ShopContext({children}) {
 
 
     let value = {
-      products, currency , delivery_fee,getProducts,search,setSearch,showSearch,setShowSearch,cartItem, addtoCart, getCartCount, setCartItem ,updateQuantity,getCartAmount,loading
+      products, currency , delivery_fee,getProducts,search,setSearch,showSearch,setShowSearch,cartItem, addtoCart, getCartCount, setCartItem ,updateQuantity,getCartAmount,getVariantPrice,loading
     }
   return (
     <div>

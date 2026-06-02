@@ -7,15 +7,22 @@ import { isClothingCategory, isWeightCategory } from "../constants/categories.js
 
 export const addProduct = async (req,res) => {
     try {
-        let {name,description,price,category,subCategory,sizes,bestseller} = req.body
+        let {name,description,price,category,subCategory,sizes,variantPrices,bestseller} = req.body
         let parsedSizes = []
+        let parsedVariantPrices = {}
         try {
             parsedSizes = JSON.parse(sizes || "[]")
         } catch {
             return res.status(400).json({message:"Product sizes must be valid JSON"})
         }
+        try {
+            parsedVariantPrices = JSON.parse(variantPrices || "{}")
+        } catch {
+            return res.status(400).json({message:"Product variant prices must be valid JSON"})
+        }
         const numericPrice = Number(price)
-        const needsSize = isClothingCategory(category) || isClothingCategory(subCategory) || isWeightCategory(category) || isWeightCategory(subCategory)
+        const needsWeight = isWeightCategory(category) || isWeightCategory(subCategory)
+        const needsSize = isClothingCategory(category) || isClothingCategory(subCategory) || needsWeight
 
         if (!name?.trim() || !description?.trim() || !category?.trim() || !subCategory?.trim()) {
             return res.status(400).json({message:"All product fields are required"})
@@ -29,8 +36,19 @@ export const addProduct = async (req,res) => {
             return res.status(400).json({message:"Product sizes must be an array"})
         }
 
+        if (!parsedVariantPrices || typeof parsedVariantPrices !== "object" || Array.isArray(parsedVariantPrices)) {
+            return res.status(400).json({message:"Product variant prices must be an object"})
+        }
+
         if (needsSize && parsedSizes.length === 0) {
             return res.status(400).json({message:"Select at least one size option"})
+        }
+
+        if (needsWeight) {
+            const missingPrice = parsedSizes.some(item => !Number(parsedVariantPrices[item]) || Number(parsedVariantPrices[item]) <= 0)
+            if (missingPrice) {
+                return res.status(400).json({message:"Add a valid price for each gram option"})
+            }
         }
 
         if (!req.files?.image1?.[0] || !req.files?.image2?.[0] || !req.files?.image3?.[0] || !req.files?.image4?.[0]) {
@@ -49,6 +67,7 @@ export const addProduct = async (req,res) => {
             category:category.trim(),
             subCategory:subCategory.trim(),
             sizes :needsSize ? parsedSizes : [],
+            variantPrices :needsWeight ? parsedVariantPrices : {},
             bestseller :bestseller === "true" ? true : false,
             date :Date.now(),
             image1,
@@ -113,7 +132,7 @@ export const removeProduct = async (req,res) => {
 export const updateProduct = async (req,res) => {
     try {
         const {id} = req.params
-        let {name,description,price,category,subCategory,sizes,bestseller} = req.body
+        let {name,description,price,category,subCategory,sizes,variantPrices,bestseller} = req.body
         let updateData = {}
 
         if (name !== undefined) {
@@ -161,6 +180,18 @@ export const updateProduct = async (req,res) => {
                 updateData.sizes = parsedSizes
             } catch {
                 return res.status(400).json({message:"Product sizes must be valid JSON"})
+            }
+        }
+
+        if (variantPrices !== undefined) {
+            try {
+                const parsedVariantPrices = JSON.parse(variantPrices || "{}")
+                if (!parsedVariantPrices || typeof parsedVariantPrices !== "object" || Array.isArray(parsedVariantPrices)) {
+                    return res.status(400).json({message:"Product variant prices must be an object"})
+                }
+                updateData.variantPrices = parsedVariantPrices
+            } catch {
+                return res.status(400).json({message:"Product variant prices must be valid JSON"})
             }
         }
 

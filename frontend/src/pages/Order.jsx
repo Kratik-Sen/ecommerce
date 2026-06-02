@@ -25,7 +25,10 @@ function Order() {
               payment: order.payment,
               paymentMethod: order.paymentMethod,
               date: order.date,
-              orderId: order._id
+              orderId: order._id,
+              orderAmount: order.amount,
+              address: order.address,
+              orderItems: order.items
             })
           })
         })
@@ -44,6 +47,32 @@ function Order() {
     const estimate = new Date(date)
     estimate.setDate(estimate.getDate() + 3)
     return estimate.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
+  }
+
+  const downloadInvoice = (item) => {
+    const orderItems = Array.isArray(item.orderItems) ? item.orderItems : [item]
+    const address = item.address || {}
+    const orderNumber = String(item.orderId || item._id).slice(-10).toUpperCase()
+    const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char]))
+    const rows = orderItems.map(orderItem => {
+      const option = orderItem.size && orderItem.size !== noSizeKey ? orderItem.size : "-"
+      const price = Number(orderItem.price || 0)
+      const quantity = Number(orderItem.quantity || 1)
+      return `<tr><td>${escapeHtml(orderItem.name || "Product")}</td><td>${escapeHtml(option)}</td><td>${quantity}</td><td>${currency} ${price}</td><td>${currency} ${price * quantity}</td></tr>`
+    }).join("")
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Invoice ${orderNumber}</title><style>body{font-family:Arial,sans-serif;color:#1f2a24;padding:32px;background:#f8f4e8}main{max-width:820px;margin:auto;background:#fffaf0;border:1px solid #d8ded8;padding:28px}h1{color:#2f6f4e;margin:0 0 8px}table{width:100%;border-collapse:collapse;margin-top:22px}th,td{border-bottom:1px solid #d8ded8;padding:12px;text-align:left}th{color:#2f6f4e}.total{text-align:right;font-size:20px;font-weight:700;margin-top:22px}.muted{color:#59645d}</style></head><body><main><h1>HD Traders Invoice</h1><p class="muted">Invoice #ORD-${orderNumber}</p><p><b>Date:</b> ${new Date(item.date).toLocaleString()}</p><p><b>Customer:</b> ${escapeHtml(`${address.firstName || ""} ${address.lastName || ""}`)}</p><p><b>Address:</b> ${escapeHtml([address.street, address.city, address.state, address.pinCode, address.country].filter(Boolean).join(", "))}</p><p><b>Payment:</b> ${escapeHtml(item.paymentMethod || "COD")} (${item.payment ? "Paid" : "Pending"})</p><table><thead><tr><th>Product</th><th>Option</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead><tbody>${rows}</tbody></table><p class="total">Order Total: ${currency} ${item.orderAmount || 0}</p></main></body></html>`
+    const blob = new Blob([html], { type: "text/html" })
+    const link = document.createElement("a")
+    link.href = URL.createObjectURL(blob)
+    link.download = `invoice-${orderNumber}.html`
+    link.click()
+    URL.revokeObjectURL(link.href)
   }
 
   return (
@@ -90,7 +119,7 @@ function Order() {
                       <p className='font-bold text-[#2f6f4e]'>{item.paymentMethod || "COD"}</p>
                     </div>
                   </div>
-                  <button type='button' className='inline-flex h-[50px] items-center justify-center gap-[10px] rounded-xl border-[1px] border-[#74c69d] px-[18px] text-[14px] font-bold text-[#2f6f4e] transition hover:bg-[#e9efe4]'>
+                  <button type='button' className='inline-flex h-[50px] items-center justify-center gap-[10px] rounded-xl border-[1px] border-[#74c69d] px-[18px] text-[14px] font-bold text-[#2f6f4e] transition hover:bg-[#e9efe4]' onClick={() => downloadInvoice(item)}>
                     <FiDownload /> Download Invoice
                   </button>
                 </div>
@@ -136,7 +165,7 @@ function Order() {
               <p className='text-[14px] text-[#59645d]'>Our support team is here to assist you.</p>
             </div>
           </div>
-          <button type='button' className='inline-flex h-[48px] items-center justify-center gap-[10px] rounded-xl border-[1px] border-[#74c69d] px-[20px] font-bold text-[#2f6f4e]' onClick={() => navigate("/contact")}>Contact Support <FiArrowRight /></button>
+          <button type='button' className='inline-flex h-[48px] items-center justify-center gap-[10px] rounded-xl border-[1px] border-[#74c69d] px-[20px] font-bold text-[#2f6f4e] transition hover:bg-[#2f6f4e] hover:text-[#fffaf0] hover:shadow-lg hover:shadow-[#8f968f33]' onClick={() => navigate("/contact")}>Contact Support <FiArrowRight /></button>
         </div>
       </div>
     </main>

@@ -18,6 +18,7 @@ function Lists() {
     category: "",
     subCategory: "",
     sizes: "",
+    variantPrices: "",
     bestseller: false,
   })
   const { serverUrl } = useContext(authDataContext)
@@ -63,6 +64,7 @@ function Lists() {
       category: product.category || "",
       subCategory: product.subCategory || "",
       sizes: Array.isArray(product.sizes) ? product.sizes.join(", ") : "",
+      variantPrices: JSON.stringify(product.variantPrices || {}, null, 2),
       bestseller: !!product.bestseller,
     })
   }
@@ -83,6 +85,7 @@ function Lists() {
       formData.append("category", editData.category.trim())
       formData.append("subCategory", editData.subCategory.trim())
       formData.append("sizes", JSON.stringify(editData.sizes.split(",").map(item => item.trim()).filter(Boolean)))
+      formData.append("variantPrices", editData.variantPrices || "{}")
       formData.append("bestseller", editData.bestseller)
 
       const result = await axios.post(`${serverUrl}/api/product/update/${editingProduct._id}`, formData, { withCredentials: true })
@@ -120,8 +123,13 @@ function Lists() {
           </div>
 
           {editingProduct && (
-            <form onSubmit={updateProduct} className='mb-[22px] rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0e8] p-[20px] shadow-xl shadow-[#8f968f22]'>
-              <div className='mb-[16px] text-[24px] font-bold text-[#0f4d45]'>Update Product</div>
+            <>
+            <div className='fixed inset-0 z-40 bg-[#1f2a2473] backdrop-blur-sm' onClick={() => setEditingProduct(null)}></div>
+            <form onSubmit={updateProduct} className='fixed left-1/2 top-1/2 z-50 max-h-[calc(100vh-32px)] w-[calc(100vw-32px)] max-w-[920px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border-[1px] border-[#d8ded8] bg-[#fffaf0] p-[20px] shadow-2xl shadow-[#1f2a2455]'>
+              <div className='mb-[16px] flex items-center justify-between gap-[12px]'>
+                <div className='text-[24px] font-bold text-[#0f4d45]'>Update Product</div>
+                <button type='button' className='flex h-[42px] w-[42px] items-center justify-center rounded-full bg-[#eef3ea] text-[22px] text-[#2f6f4e]' onClick={() => setEditingProduct(null)} aria-label='Close update product'><FiX /></button>
+              </div>
               <div className='grid gap-[12px] lg:grid-cols-2'>
                 <input name='name' value={editData.name} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Product name' required />
                 <input name='price' type='number' value={editData.price} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Price' required />
@@ -129,6 +137,7 @@ function Lists() {
                 <input name='category' value={editData.category} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Category' required />
                 <input name='subCategory' value={editData.subCategory} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Sub-category' required />
                 <input name='sizes' value={editData.sizes} onChange={updateEditData} className='h-[44px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] outline-none focus:border-[#74c69d]' placeholder='Sizes, e.g. S, M or 250g, 500g' />
+                <textarea name='variantPrices' value={editData.variantPrices} onChange={updateEditData} className='min-h-[90px] rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[14px] py-[10px] font-mono text-[13px] outline-none focus:border-[#74c69d] lg:col-span-2' placeholder='Gram prices JSON, e.g. {"250g": 199, "500g": 349}' />
                 <label className='flex h-[44px] items-center gap-[10px] text-[15px]'>
                   <input type='checkbox' name='bestseller' checked={editData.bestseller} onChange={updateEditData} className='h-[18px] w-[18px]' />
                   Bestseller
@@ -139,6 +148,7 @@ function Lists() {
                 <button type='button' className='rounded-lg border-[1px] border-[#d8ded8] bg-[#fffaf0] px-[24px] py-[11px] font-bold text-[#2f6f4e]' onClick={() => setEditingProduct(null)}>Cancel</button>
               </div>
             </form>
+            </>
           )}
 
           <div className='space-y-[18px]'>

@@ -41,6 +41,10 @@ const productSchema = new mongoose.Schema({
         type:Array,
         required:true
     },
+    variantPrices:{
+        type:Object,
+        default:{}
+    },
     date:{
         type:Number,
         required:true
